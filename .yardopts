@@ -1,0 +1,6 @@
+--readme README.md
+--title 'MFC Case Documentation'
+--charset utf-8
+--markup markdown
+--private
+- CHANGELOG.md docs/**/*.md
