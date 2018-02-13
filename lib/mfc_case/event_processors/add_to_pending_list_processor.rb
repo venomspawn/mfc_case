@@ -129,7 +129,8 @@ module MFCCase
       #
       def add_to_register
         register = find_or_create_register
-        CaseCore::Models::CaseRegister.create(case: c4s3, register: register)
+        args = { case_id: c4s3.id, register_id: register.id }
+        CaseCore::Models::CaseRegister.create(args)
       end
     end
   end

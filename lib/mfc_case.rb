@@ -1,5 +1,8 @@
 # encoding: utf-8
 
+require 'active_support/core_ext/object/blank.rb'
+require 'active_support/core_ext/string/filters.rb'
+
 load "#{__dir__}/mfc_case/event_processors.rb"
 load "#{__dir__}/mfc_case/version.rb"
 
