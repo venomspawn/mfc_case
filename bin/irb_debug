@@ -9,6 +9,12 @@ require 'irb'
 require 'irb/completion'
 
 begin
+  require_relative '../lib/mfc_case'
+rescue LoadError
+  nil
+end
+
+begin
   require_relative '../spec/spec_helper'
 rescue LoadError
   nil
