@@ -74,7 +74,8 @@ RSpec.describe MFCCase::EventProcessors::ExportRegisterProcessor do
     let(:params) { { operator_id: '123' } }
     let(:c4s3) { create(:case) }
     let!(:link) { put_cases_into_register(register, c4s3) }
-    let!(:attrs) { create(:case_attributes, case: c4s3, status: 'pending') }
+    let!(:attrs) { create(:case_attributes, **args) }
+    let(:args) { { case_id: c4s3.id, status: 'pending' } }
 
     it 'should set `exported` attribute of the register to `true`' do
       subject
@@ -110,8 +111,9 @@ RSpec.describe MFCCase::EventProcessors::ExportRegisterProcessor do
 
     context 'when case has `issue_location_type` attribute' do
       context 'when the value of the attribute is `institution`' do
-        let!(:more_attrs) { create(:case_attributes, case: c4s3, **traits) }
-        let(:traits) {  { issue_location_type: 'institution' } }
+        let!(:more_attrs) { create(:case_attributes, **traits) }
+        let(:traits) { { case_id: c4s3.id, issue_location_type: location } }
+        let(:location) { 'institution' }
 
         it 'should set case status to `closed`' do
           subject
@@ -122,8 +124,8 @@ RSpec.describe MFCCase::EventProcessors::ExportRegisterProcessor do
 
     context 'when case has `added_to_rejecting_at` attribute' do
       context 'when the value of the attribute is present' do
-        let!(:more_attrs) { create(:case_attributes, case: c4s3, **traits) }
-        let(:traits) { { added_to_rejecting_at: Time.now } }
+        let!(:more_attrs) { create(:case_attributes, **traits) }
+        let(:traits) { { case_id: c4s3.id, added_to_rejecting_at: Time.now } }
 
         it 'should set case status to `closed`' do
           subject
@@ -141,7 +143,7 @@ RSpec.describe MFCCase::EventProcessors::ExportRegisterProcessor do
     end
 
     context 'when there is case in the register with absent status' do
-      let!(:attrs) { create(:case_attributes, case: c4s3, stat: '') }
+      let!(:attrs) { create(:case_attributes, case_id: c4s3.id, stat: '') }
 
       it 'should raise RuntimeError' do
         expect { subject }.to raise_error(RuntimeError)
@@ -149,7 +151,8 @@ RSpec.describe MFCCase::EventProcessors::ExportRegisterProcessor do
     end
 
     context 'when there is case in the register with invalid status' do
-      let!(:attrs) { create(:case_attributes, case: c4s3, status: 'invalid') }
+      let!(:attrs) { create(:case_attributes, **traits) }
+      let(:traits) { { case_id: c4s3.id, status: 'invalid' } }
 
       it 'should raise RuntimeError' do
         expect { subject }.to raise_error(RuntimeError)

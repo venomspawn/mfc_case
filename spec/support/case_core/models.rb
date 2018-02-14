@@ -65,6 +65,49 @@ module CaseCore
           array.each(&block)
         end
 
+        # Возвращает объект выборки
+        #
+        # @return [CaseCore::Models::Model::Dataset]
+        #   объект выборки
+        #
+        def naked
+          self
+        end
+
+        # Возвращает список значений поля записи с предоставленным названием
+        #
+        # @param [Object] key
+        #   название поля
+        #
+        def select(key)
+          array.map { |obj| obj[key] }
+        end
+
+        # Возвращает ассоциативный массив, ключами которого являются значения
+        # экземпляров структуры по ключу, совпадающему со значением параметра
+        # `key`, а значениями — списки списков значений, полученные по ключам,
+        # совпадающим со значениями в списке `value_keys`
+        #
+        # @param [Symbol] key
+        #   название ключа, по значениям которого будет производиться
+        #   группировка
+        #
+        # @param [Array<Symbol>] value_keys
+        #   названия ключей, значения которого попадут в значения
+        #   ассоциативного массива
+        #
+        # @return [Hash]
+        #   результирующий ассоциативный массив
+        #
+        def select_hash_groups(key, value_keys)
+          offsets = value_keys.map(&model.members.method(:find_index))
+          array.each_with_object({}) do |obj, memo|
+            key_value = obj[key]
+            memo[key_value] ||= []
+            memo[key_value] << obj.values_at(*offsets)
+          end
+        end
+
         private
 
         # Список записей выборки
@@ -175,16 +218,58 @@ module CaseCore
         #   результирующая выборка
         #
         def where(hash)
-          offsets = hash.each_key.map(&members.method(:find_index))
-          values = hash.values
-          array = datalist.find_all { |obj| obj.values_at(*offsets) == values }
+          wrong_keys = hash.keys - members
+          return Dataset.new([], self) unless wrong_keys.empty?
+          array_hash = arrayfy_values(hash)
+          array = datalist.find_all { |obj| include_values?(obj, array_hash) }
           Dataset.new(array, self)
+        end
+
+        private
+
+        # Возвращает новый ассоциативный массив, построенный на основе
+        # предоставленного, сохраняя ключи и преобразуя каждое значение в
+        # одноэлементный список, если оно не является списком
+        #
+        # @param [Hash] hash
+        #   исходный ассоциативный массив
+        #
+        # @return [Hash]
+        #   построенный ассоциативный массив
+        #
+        def arrayfy_values(hash)
+          hash.each_with_object({}) { |(k, v), memo| memo[k] = Array(v) }
+        end
+
+        # Проверяет, что значения полей экземпляра структуры находятся в
+        # соответствующих названиям полей значениях предоставленного
+        # ассоциативного массива
+        #
+        # @param [Struct] obj
+        #   экземпляр структуры
+        #
+        # @param [Hash{Symbol => Array}] array_hash
+        #   ассоциативный массив, отображающий названия полей в списки значений
+        #
+        def include_values?(obj, array_hash)
+          array_hash.inject(true) do |memo, (k, array)|
+            memo && array.include?(obj[k])
+          end
         end
       end
 
       # Модуль методов экземпляров структуры
       #
       module InstanceMethods
+        # Обновляет значения полей соответственно предоствленному
+        # ассоциативному массиву
+        #
+        # @param [Hash]
+        #   предоставленный ассоциативный массив
+        #
+        def update(hash)
+          hash.each { |k, v| self[k] = v }
+        end
       end
     end
 
@@ -203,14 +288,27 @@ module CaseCore
                                   exported_at
                                 )
 
-    # Удаляет экземпляр из списка экземпляров
-    #
-    # @param [Struct] obj
-    #   экземпляр
-    #
-    def Register.remove(obj)
-      super
-      CaseRegister.where(register_id: obj.id).delete if obj.is_a?(Register)
+    class Register
+      # Удаляет экземпляр из списка экземпляров
+      #
+      # @param [Struct] obj
+      #   экземпляр
+      #
+      def self.remove(obj)
+        super
+        CaseRegister.where(register_id: obj.id).delete if obj.is_a?(Register)
+      end
+
+      # Возвращает выборку всех записей заявок, ассоциированных с записью
+      # реестра
+      #
+      # @return [CaseCore::Models::Model::Dataset]
+      #   выборка всех записей заявок, ассоциированных с записью реестра
+      #
+      def cases_dataset
+        cases_ids = CaseRegister.where(register_id: id).select(:case_id)
+        Case.where(id: cases_ids)
+      end
     end
   end
 end

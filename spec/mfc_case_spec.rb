@@ -23,7 +23,8 @@ RSpec.describe MFCCase do
     let(:params) { { operator_id: '123' } }
     let(:c4s3) { create(:case) }
     let!(:link) { put_cases_into_register(register, c4s3) }
-    let!(:attrs) { create(:case_attributes, case: c4s3, status: 'pending') }
+    let!(:attrs) { create(:case_attributes, **args) }
+    let(:args) { { case_id: c4s3.id, status: 'pending' } }
 
     it 'should set `exported` attribute of the register to `true`' do
       subject
@@ -57,6 +58,56 @@ RSpec.describe MFCCase do
       expect(case_status(c4s3)).to be == 'processing'
     end
 
+    context 'when case has `issue_location_type` attribute' do
+      context 'when the value of the attribute is `institution`' do
+        let!(:more_attrs) { create(:case_attributes, **traits) }
+        let(:traits) { { case_id: c4s3.id, issue_location_type: location } }
+        let(:location) { 'institution' }
+
+        it 'should set case status to `closed`' do
+          subject
+          expect(case_status(c4s3)).to be == 'closed'
+        end
+      end
+    end
+
+    context 'when case has `added_to_rejecting_at` attribute' do
+      context 'when the value of the attribute is present' do
+        let!(:more_attrs) { create(:case_attributes, **traits) }
+        let(:traits) { { case_id: c4s3.id, added_to_rejecting_at: Time.now } }
+
+        it 'should set case status to `closed`' do
+          subject
+          expect(case_status(c4s3)).to be == 'closed'
+        end
+      end
+    end
+
+    context 'when there is attributeless case in the register' do
+      let!(:attrs) {}
+
+      it 'should raise RuntimeError' do
+        expect { subject }.to raise_error(RuntimeError)
+      end
+    end
+
+    context 'when there is case in the register with absent status' do
+      let!(:attrs) { create(:case_attributes, case_id: c4s3.id, stat: '') }
+
+      it 'should raise RuntimeError' do
+        expect { subject }.to raise_error(RuntimeError)
+      end
+    end
+
+    context 'when there is case in the register with invalid status' do
+      let!(:attrs) { create(:case_attributes, **traits) }
+      let(:traits) { { case_id: c4s3.id, status: 'invalid' } }
+
+      it 'should raise RuntimeError' do
+        expect { subject }.to raise_error(RuntimeError)
+      end
+    end
+
     context 'when `register` argument is of wrong type' do
       let(:register) { 'of wrong type' }
       let!(:link) {}
@@ -81,58 +132,64 @@ RSpec.describe MFCCase do
         expect { subject }.to raise_error(RuntimeError)
       end
     end
-
-    context 'when case has `issue_location_type` attribute' do
-      context 'when the value of the attribute is `institution`' do
-        let!(:more_attrs) { create(:case_attributes, case: c4s3, **traits) }
-        let(:traits) {  { issue_location_type: 'institution' } }
-
-        it 'should set case status to `closed`' do
-          subject
-          expect(case_status(c4s3)).to be == 'closed'
-        end
-      end
-    end
-
-    context 'when case has `added_to_rejecting_at` attribute' do
-      context 'when the value of the attribute is present' do
-        let!(:more_attrs) { create(:case_attributes, case: c4s3, **traits) }
-        let(:traits) { { added_to_rejecting_at: Time.now } }
-
-        it 'should set case status to `closed`' do
-          subject
-          expect(case_status(c4s3)).to be == 'closed'
-        end
-      end
-    end
-
-    context 'when there is attributeless case in the register' do
-      let!(:attrs) {}
-
-      it 'should raise RuntimeError' do
-        expect { subject }.to raise_error(RuntimeError)
-      end
-    end
-
-    context 'when there is case in the register with absent status' do
-      let!(:attrs) { create(:case_attributes, case: c4s3, stat: '') }
-
-      it 'should raise RuntimeError' do
-        expect { subject }.to raise_error(RuntimeError)
-      end
-    end
-
-    context 'when there is case in the register with invalid status' do
-      let!(:attrs) { create(:case_attributes, case: c4s3, status: 'invalid') }
-
-      it 'should raise RuntimeError' do
-        expect { subject }.to raise_error(RuntimeError)
-      end
-    end
   end
 
   describe '.change_status_to' do
     subject { described_class.change_status_to(c4s3, status, params) }
+
+    context 'when `case` argument is not of `CaseCore::Models::Case` type' do
+      let(:c4s3) { 'not of `CaseCore::Models::Case` type' }
+      let(:status) { 'pending' }
+      let(:params) { nil }
+
+      it 'should raise ArgumentError' do
+        expect { subject }.to raise_error(ArgumentError)
+      end
+    end
+
+    context 'when case type is wrong' do
+      let(:c4s3) { create(:case, type: :wrong) }
+      let(:status) { 'pending' }
+      let(:params) { nil }
+
+      it 'should raise RuntimeError' do
+        expect { subject }.to raise_error(RuntimeError)
+      end
+    end
+
+    context 'when case status is absent' do
+      let(:c4s3) { create(:case, type: 'mfc_case') }
+      let(:status) { 'pending' }
+      let(:params) { nil }
+
+      it 'should raise RuntimeError' do
+        expect { subject }.to raise_error(RuntimeError)
+      end
+    end
+
+    context 'when `params` argument is not of `NilClass` nor of `Hash` type' do
+      let(:c4s3) { create(:case, type: 'mfc_case') }
+      let!(:case_attributes) { create(:case_attributes, **traits) }
+      let(:traits) { { case_id: c4s3.id, status: 'packaging' } }
+      let(:status) { 'pending' }
+      let(:params) { 'not of `NilClass` nor of `Hash` type' }
+
+      it 'should raise ArgumentError' do
+        expect { subject }.to raise_error(ArgumentError)
+      end
+    end
+
+    context 'when case status transition isn\'t supported' do
+      let(:c4s3) { create(:case, type: 'mfc_case') }
+      let!(:case_attributes) { create(:case_attributes, **traits) }
+      let(:traits) { { case_id: c4s3.id, status: 'packaging' } }
+      let(:status) { 'a status' }
+      let(:params) { nil }
+
+      it 'should raise RuntimeError' do
+        expect { subject }.to raise_error(RuntimeError)
+      end
+    end
 
     context 'when case status is switching from `packaging` to `pending`' do
       include MFCCase::EventProcessors::AddToPendingListProcessorSpecHelper
@@ -158,7 +215,7 @@ RSpec.describe MFCCase do
 
         it 'should link the case to the created register' do
           expect { subject }
-            .to change { case_registers.where(case: c4s3).count }
+            .to change { case_registers.where(case_id: c4s3.id).count }
             .by(1)
         end
       end
@@ -172,7 +229,7 @@ RSpec.describe MFCCase do
 
         it 'should link the case to the created register' do
           expect { subject }
-            .to change { case_registers.where(case: c4s3).count }
+            .to change { case_registers.where(case_id: c4s3.id).count }
             .by(1)
         end
       end
@@ -202,7 +259,7 @@ RSpec.describe MFCCase do
 
         it 'should link the case to the created register' do
           expect { subject }
-            .to change { case_registers.where(case: c4s3).count }
+            .to change { case_registers.where(case_id: c4s3.id).count }
             .by(1)
         end
       end
@@ -216,7 +273,7 @@ RSpec.describe MFCCase do
 
         it 'should link the case to the created register' do
           expect { subject }
-            .to change { case_registers.where(case: c4s3).count }
+            .to change { case_registers.where(case_id: c4s3.id).count }
             .by(1)
         end
       end
@@ -244,7 +301,7 @@ RSpec.describe MFCCase do
 
       it 'should remove the case from the register' do
         expect { subject }
-          .to change { case_registers.with_pk([c4s3.id, register.id]) }
+          .to change { case_register_with_pk(c4s3.id, register.id) }
           .to(nil)
       end
 
@@ -259,7 +316,7 @@ RSpec.describe MFCCase do
       context 'when the register contains only the case' do
         it 'should delete the register' do
           expect { subject }
-            .to change { registers.with_pk(register.id) }
+            .to change { registers.where(id: register.id).first }
             .to(nil)
         end
       end
@@ -269,7 +326,8 @@ RSpec.describe MFCCase do
         let!(:another_link) { put_cases_into_register(register, another_case) }
 
         it 'shouldn\'t delete the register' do
-          expect { subject }.not_to change { registers.with_pk(register.id) }
+          expect { subject }
+            .not_to change { registers.where(id: register.id).first }
         end
       end
 
@@ -279,7 +337,7 @@ RSpec.describe MFCCase do
 
         it 'shouldn\'t remove the case from this older register' do
           expect { subject }
-            .not_to change { case_registers.with_pk([c4s3.id, register2.id]) }
+            .not_to change { case_register_with_pk(c4s3.id, register2.id) }
         end
       end
     end
@@ -306,7 +364,7 @@ RSpec.describe MFCCase do
 
       it 'should remove the case from the register' do
         expect { subject }
-          .to change { case_registers.with_pk([c4s3.id, register.id]) }
+          .to change { case_register_with_pk(c4s3.id, register.id) }
           .to(nil)
       end
 
@@ -321,7 +379,7 @@ RSpec.describe MFCCase do
       context 'when the register contains only the case' do
         it 'should delete the register' do
           expect { subject }
-            .to change { registers.with_pk(register.id) }
+            .to change { registers.where(id: register.id).first }
             .to(nil)
         end
       end
@@ -331,7 +389,8 @@ RSpec.describe MFCCase do
         let!(:another_link) { put_cases_into_register(register, another_case) }
 
         it 'shouldn\'t delete the register' do
-          expect { subject }.not_to change { registers.with_pk(register.id) }
+          expect { subject }
+            .not_to change { registers.where(id: register.id).first }
         end
       end
 
@@ -341,7 +400,7 @@ RSpec.describe MFCCase do
 
         it 'shouldn\'t remove the case from this older register' do
           expect { subject }
-            .not_to change { case_registers.with_pk([c4s3.id, register2.id]) }
+            .not_to change { case_register_with_pk(c4s3.id, register2.id) }
         end
       end
     end
@@ -404,8 +463,8 @@ RSpec.describe MFCCase do
 
       context 'when `rejecting_expected_at` attribute is absent' do
         let(:c4s3) { create(:case, type: 'mfc_case') }
-        let!(:attrs) { create(:case_attributes, case: c4s3, status: issuance) }
-        let(:issuance) { 'issuance' }
+        let!(:attrs) { create(:case_attributes, **args) }
+        let(:args) { { case_id: c4s3.id, status: 'issuance' } }
 
         it 'should raise ArgumentError' do
           expect { subject }.to raise_error(ArgumentError)
@@ -456,7 +515,8 @@ RSpec.describe MFCCase do
 
       context 'when `rejecting_expected_at` attribute is absent' do
         let(:c4s3) { create(:case, type: 'mfc_case') }
-        let!(:attrs) { create(:case_attributes, case: c4s3, status: 'issuance') }
+        let!(:attrs) { create(:case_attributes, **args) }
+        let(:args) { { case_id: c4s3.id, status: 'issuance' } }
 
         it 'should raise ArgumentError' do
           expect { subject }.to raise_error(ArgumentError)
@@ -519,7 +579,7 @@ RSpec.describe MFCCase do
     context 'when case status is present' do
       let(:c4s3) { create(:case, type: 'mfc_case') }
       let!(:case_attribute) { create(:case_attribute, *traits) }
-      let(:traits) { [case: c4s3, name: 'status', value: 'status'] }
+      let(:traits) { [case_id: c4s3.id, name: 'status', value: 'status'] }
 
       it 'should raise RuntimeError' do
         expect { subject }.to raise_error(RuntimeError)

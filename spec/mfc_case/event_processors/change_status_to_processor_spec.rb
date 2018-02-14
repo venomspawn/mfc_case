@@ -17,9 +17,9 @@ RSpec.describe MFCCase::EventProcessors::ChangeStatusToProcessor do
   describe '.new' do
     subject(:result) { described_class.new(c4s3, status, params) }
 
-    let(:c4s3) { create(:case, type: :mfc_case) }
-    let!(:case_attributes) { create(:case_attributes, case: c4s3, **traits) }
-    let(:traits) { { status: 'packaging' } }
+    let(:c4s3) { create(:case, type: 'mfc_case') }
+    let!(:case_attributes) { create(:case_attributes, **traits) }
+    let(:traits) { { case_id: c4s3.id, status: 'packaging' } }
     let(:status) { 'pending' }
     let(:params) { nil }
 
@@ -47,7 +47,7 @@ RSpec.describe MFCCase::EventProcessors::ChangeStatusToProcessor do
     end
 
     context 'when case status is absent' do
-      let(:c4s3) { create(:case, type: :mfc_case) }
+      let(:c4s3) { create(:case, type: 'mfc_case') }
       let!(:case_attributes) {}
 
       it 'should raise RuntimeError' do
@@ -75,9 +75,9 @@ RSpec.describe MFCCase::EventProcessors::ChangeStatusToProcessor do
   describe 'instance' do
     subject { described_class.new(c4s3, status, params) }
 
-    let(:c4s3) { create(:case, type: :mfc_case) }
-    let!(:case_attributes) { create(:case_attributes, case: c4s3, **traits) }
-    let(:traits) { { status: 'packaging' } }
+    let(:c4s3) { create(:case, type: 'mfc_case') }
+    let!(:case_attributes) { create(:case_attributes, **traits) }
+    let(:traits) { { case_id: c4s3.id, status: 'packaging' } }
     let(:status) { 'pending' }
     let(:params) { nil }
 
@@ -113,7 +113,7 @@ RSpec.describe MFCCase::EventProcessors::ChangeStatusToProcessor do
 
         it 'should link the case to the created register' do
           expect { subject }
-            .to change { case_registers.where(case: c4s3).count }
+            .to change { case_registers.where(case_id: c4s3.id).count }
             .by(1)
         end
       end
@@ -127,7 +127,7 @@ RSpec.describe MFCCase::EventProcessors::ChangeStatusToProcessor do
 
         it 'should link the case to the created register' do
           expect { subject }
-            .to change { case_registers.where(case: c4s3).count }
+            .to change { case_registers.where(case_id: c4s3.id).count }
             .by(1)
         end
       end
@@ -157,7 +157,7 @@ RSpec.describe MFCCase::EventProcessors::ChangeStatusToProcessor do
 
         it 'should link the case to the created register' do
           expect { subject }
-            .to change { case_registers.where(case: c4s3).count }
+            .to change { case_registers.where(case_id: c4s3.id).count }
             .by(1)
         end
       end
@@ -171,7 +171,7 @@ RSpec.describe MFCCase::EventProcessors::ChangeStatusToProcessor do
 
         it 'should link the case to the created register' do
           expect { subject }
-            .to change { case_registers.where(case: c4s3).count }
+            .to change { case_registers.where(case_id: c4s3.id).count }
             .by(1)
         end
       end
@@ -199,7 +199,7 @@ RSpec.describe MFCCase::EventProcessors::ChangeStatusToProcessor do
 
       it 'should remove the case from the register' do
         expect { subject }
-          .to change { case_registers.with_pk([c4s3.id, register.id]) }
+          .to change { case_register_with_pk(c4s3.id, register.id) }
           .to(nil)
       end
 
@@ -214,7 +214,7 @@ RSpec.describe MFCCase::EventProcessors::ChangeStatusToProcessor do
       context 'when the register contains only the case' do
         it 'should delete the register' do
           expect { subject }
-            .to change { registers.with_pk(register.id) }
+            .to change { registers.where(id: register.id).first }
             .to(nil)
         end
       end
@@ -224,7 +224,8 @@ RSpec.describe MFCCase::EventProcessors::ChangeStatusToProcessor do
         let!(:another_link) { put_cases_into_register(register, another_case) }
 
         it 'shouldn\'t delete the register' do
-          expect { subject }.not_to change { registers.with_pk(register.id) }
+          expect { subject }
+            .not_to change { registers.where(id: register.id).first }
         end
       end
 
@@ -234,7 +235,7 @@ RSpec.describe MFCCase::EventProcessors::ChangeStatusToProcessor do
 
         it 'shouldn\'t remove the case from this older register' do
           expect { subject }
-            .not_to change { case_registers.with_pk([c4s3.id, register2.id]) }
+            .not_to change { case_register_with_pk(c4s3.id, register2.id) }
         end
       end
     end
@@ -261,7 +262,7 @@ RSpec.describe MFCCase::EventProcessors::ChangeStatusToProcessor do
 
       it 'should remove the case from the register' do
         expect { subject }
-          .to change { case_registers.with_pk([c4s3.id, register.id]) }
+          .to change { case_register_with_pk(c4s3.id, register.id) }
           .to(nil)
       end
 
@@ -276,7 +277,7 @@ RSpec.describe MFCCase::EventProcessors::ChangeStatusToProcessor do
       context 'when the register contains only the case' do
         it 'should delete the register' do
           expect { subject }
-            .to change { registers.with_pk(register.id) }
+            .to change { registers.where(id: register.id).first }
             .to(nil)
         end
       end
@@ -286,7 +287,8 @@ RSpec.describe MFCCase::EventProcessors::ChangeStatusToProcessor do
         let!(:another_link) { put_cases_into_register(register, another_case) }
 
         it 'shouldn\'t delete the register' do
-          expect { subject }.not_to change { registers.with_pk(register.id) }
+          expect { subject }
+            .not_to change { registers.where(id: register.id).first }
         end
       end
 
@@ -296,7 +298,7 @@ RSpec.describe MFCCase::EventProcessors::ChangeStatusToProcessor do
 
         it 'shouldn\'t remove the case from this older register' do
           expect { subject }
-            .not_to change { case_registers.with_pk([c4s3.id, register2.id]) }
+            .not_to change { case_register_with_pk(c4s3.id, register2.id) }
         end
       end
     end
@@ -359,8 +361,8 @@ RSpec.describe MFCCase::EventProcessors::ChangeStatusToProcessor do
 
       context 'when `rejecting_expected_at` attribute is absent' do
         let(:c4s3) { create(:case, type: 'mfc_case') }
-        let!(:attrs) { create(:case_attributes, case: c4s3, status: issuance) }
-        let(:issuance) { 'issuance' }
+        let!(:attrs) { create(:case_attributes, **args) }
+        let(:args) { { case_id: c4s3.id, status: 'issuance' } }
 
         it 'should raise ArgumentError' do
           expect { subject }.to raise_error(ArgumentError)
@@ -411,7 +413,8 @@ RSpec.describe MFCCase::EventProcessors::ChangeStatusToProcessor do
 
       context 'when `rejecting_expected_at` attribute is absent' do
         let(:c4s3) { create(:case, type: 'mfc_case') }
-        let!(:attrs) { create(:case_attributes, case: c4s3, status: 'issuance') }
+        let!(:attrs) { create(:case_attributes, **args) }
+        let(:args) { { case_id: c4s3.id, status: 'issuance' } }
 
         it 'should raise ArgumentError' do
           expect { subject }.to raise_error(ArgumentError)

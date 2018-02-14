@@ -181,7 +181,7 @@ module MFCCase
       # заявок, прикреплённых к записи реестра, соответствуют списки
       # двухэлементных списков, состоящих из названия и значения атрибута
       #
-      # @return [Hash{String => Array<(String, Object)>}]
+      # @return [Hash{String => Array<Array<(String, Object)>>}]
       #   результирующий ассоциативный массив
       #
       # @raise [RuntimeError]
