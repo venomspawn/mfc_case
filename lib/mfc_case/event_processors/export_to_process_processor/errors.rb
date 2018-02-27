@@ -2,7 +2,7 @@
 
 module MFCCase
   module EventProcessors
-    class RemoveFromPendingListProcessor < Base::CaseEventProcessor
+    class ExportToProcessProcessor < Base::CaseEventProcessor
       # @author Александр Ильчуков <a.s.ilchukov@cit.rkomi.ru>
       #
       # Модуль, предоставляющий пространства имён исключений, используемых
@@ -12,28 +12,26 @@ module MFCCase
         # @author Александр Ильчуков <a.s.ilchukov@cit.rkomi.ru>
         #
         # Пространство имён исключений, сигнализирующих об ошибках обработки
-        # записи заявки
+        # заявки
         #
         module Case
           # @author Александр Ильчуков <a.s.ilchukov@cit.rkomi.ru>
           #
-          # Класс исключения, создаваемого в случае, когда запись заявки не
-          # прикреплена к записи реестра передаваемой корреспонденции
+          # Класс исключения, создаваемого в случае, когда невозможно перевести
+          # заявку в состояние `processing`
           #
-          class NotInRegister < RuntimeError
+          class CantProcess < RuntimeError
             # Инициализирует объект класса
             #
             # @param [CaseCore::Models::Case] c4s3
             #   запись заявки
             #
-            # @param [Object] register_id
-            #   идентификатор записи реестра
-            #
-            def initialize(c4s3, register_id)
+            def initialize(c4s3)
               super(<<-MESSAGE.squish)
-                Запись заявки с идентификатором `#{c4s3.id}` не прикреплена к
-                записи реестра передаваемой корреспонденции с идентификатором
-                `#{register_id}`
+                Невозможно перевести заявку с идентификатором `#{c4s3.id}` в
+                статус `processing`, так как либо значение атрибута заявки
+                `issue_location_type` равно `institution`, либо значение
+                атрибута заявки `added_to_rejecting_at` присутствует
               MESSAGE
             end
           end

@@ -27,34 +27,6 @@ module MFCCase
         end
       end
 
-      # Список названий атрибутов реестра передаваемой корреспонденции
-      #
-      ATTR_NAMES = %i(institution_rguid back_office_id)
-
-      # Ассоциативный массив атрибутов реестра передаваемой корреспонденции
-      #
-      REGISTER_ATTRS = { register_type: 'cases', exported: false }
-
-      # Создаёт и возвращает запись реестра передаваемой корреспонденции, с
-      # которым будет связана предоставленная запись заявки
-      #
-      # @param [CaseCore::Models::Case] c4s3
-      #   запись заявки
-      #
-      # @param [String] office_id
-      #   идентификатор офиса, куда будет отправлен реестр передаваемой
-      #   корреспонденции
-      #
-      # @return [CaseCore::Models::Register]
-      #   созданная запись реестра передаваемой корреспонденции
-      #
-      def create_appropriate_register(c4s3, office_id)
-        case_attributes = case_attributes(c4s3.id)
-        attributes = case_attributes.slice(*ATTR_NAMES).merge(REGISTER_ATTRS)
-        attributes[:office_id] = office_id
-        FactoryGirl.create(:register, attributes)
-      end
-
       # Возвращает ассоциативный массив атрибутов заявки с предоставленным
       # идентификатором записи заявки
       #
@@ -89,26 +61,6 @@ module MFCCase
       #
       def case_status(c4s3)
         case_attributes(c4s3.id)[:status]
-      end
-
-      # Возвращает объект, предоставляющий доступ к записям реестров
-      # передаваемой корреспонденции
-      #
-      # @return [#where]
-      #   результирующий объект
-      #
-      def registers
-        CaseCore::Models::Register
-      end
-
-      # Возвращает объект, предоставляющий доступ к записям связей между
-      # записями заявок и записями реестров передаваемой корреспонденции
-      #
-      # @return [#where]
-      #   результирующий объект
-      #
-      def case_registers
-        CaseCore::Models::CaseRegister
       end
     end
   end

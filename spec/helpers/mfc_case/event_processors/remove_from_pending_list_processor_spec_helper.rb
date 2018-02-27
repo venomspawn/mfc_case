@@ -64,61 +64,6 @@ module MFCCase
       def case_added_to_pending_at(c4s3)
         case_attributes(c4s3.id).dig(:added_to_pending_at)
       end
-
-      # Связывает записи реестра передаваемой корреспонденции и заявок
-      #
-      # @param [CaseCore::Models::Register] register
-      #   запись реестра передаваемой корреспонденции
-      #
-      # @param [Array<CaseCore::Models::Case>] cases
-      #   список записей заявок
-      #
-      def put_cases_into_register(register, *cases)
-        cases.map do |c4s3|
-          args = { case_id: c4s3.id, register_id: register.id }
-          CaseCore::Models::CaseRegister.create(args)
-        end
-      end
-
-      # Возвращает объект, предоставляющий доступ к записям реестров
-      # передаваемой корреспонденции
-      #
-      # @return [#where]
-      #   результирующий объект
-      #
-      def registers
-        CaseCore::Models::Register
-      end
-
-      # Возвращает объект, предоставляющий доступ к записям связей между
-      # записями заявок и записями реестров передаваемой корреспонденции
-      #
-      # @return [#where]
-      #   результирующий объект
-      #
-      def case_registers
-        CaseCore::Models::CaseRegister
-      end
-
-      # Возвращает запись структуры `CaseCore::Models::CaseRegister`, найденную
-      # по идентификатору записи заявки и идентификатору записи реестра
-      # передаваемой корреспонденции, или `nil`, если запись невозможно найти
-      #
-      # @param [Object] case_id
-      #   идентификатор записи заявки
-      #
-      # @param [Object] register_id
-      #   идентификатора записи реестра передаваемой корреспонденции
-      #
-      # @return [CaseCore::Models::CaseRegister]
-      #   найденная запись
-      #
-      # @return [NilClass]
-      #   если запись невозможно найти
-      #
-      def case_register_with_pk(case_id, register_id)
-        case_registers.where(case_id: case_id, register_id: register_id).first
-      end
     end
   end
 end
