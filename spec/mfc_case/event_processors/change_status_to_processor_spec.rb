@@ -105,32 +105,6 @@ RSpec.describe MFCCase::EventProcessors::ChangeStatusToProcessor do
         subject
         expect(case_added_to_pending_at(c4s3)).to be_within(1).of(Time.now)
       end
-
-      context 'when there is no appropriate register' do
-        it 'should create one' do
-          expect { subject }.to change { registers.count }.by(1)
-        end
-
-        it 'should link the case to the created register' do
-          expect { subject }
-            .to change { case_registers.where(case_id: c4s3.id).count }
-            .by(1)
-        end
-      end
-
-      context 'when there is appropriate register' do
-        let!(:register) { create_appropriate_register(c4s3, office_id) }
-
-        it 'shouldn\'t create any register' do
-          expect { subject }.not_to change { registers.count }
-        end
-
-        it 'should link the case to the created register' do
-          expect { subject }
-            .to change { case_registers.where(case_id: c4s3.id).count }
-            .by(1)
-        end
-      end
     end
 
     context 'when case status is switching from `rejecting` to `pending`' do
@@ -149,32 +123,6 @@ RSpec.describe MFCCase::EventProcessors::ChangeStatusToProcessor do
         subject
         expect(case_added_to_pending_at(c4s3)).to be_within(1).of(Time.now)
       end
-
-      context 'when there is no appropriate register' do
-        it 'should create one' do
-          expect { subject }.to change { registers.count }.by(1)
-        end
-
-        it 'should link the case to the created register' do
-          expect { subject }
-            .to change { case_registers.where(case_id: c4s3.id).count }
-            .by(1)
-        end
-      end
-
-      context 'when there is appropriate register' do
-        let!(:register) { create_appropriate_register(c4s3, office_id) }
-
-        it 'shouldn\'t create any register' do
-          expect { subject }.not_to change { registers.count }
-        end
-
-        it 'should link the case to the created register' do
-          expect { subject }
-            .to change { case_registers.where(case_id: c4s3.id).count }
-            .by(1)
-        end
-      end
     end
 
     context 'when case status is switching from `pending` to `packaging`' do
@@ -183,9 +131,7 @@ RSpec.describe MFCCase::EventProcessors::ChangeStatusToProcessor do
 
       let(:c4s3) { create_case(:pending, nil) }
       let(:added_to_rejecting_at) { nil }
-      let(:params) { { operator_id: '123', register_id: register.id } }
-      let(:register) { create(:register) }
-      let!(:link) { put_cases_into_register(register, c4s3) }
+      let(:params) { {} }
       let(:status) { 'packaging' }
 
       it 'should set case status to `packaging`' do
@@ -196,48 +142,6 @@ RSpec.describe MFCCase::EventProcessors::ChangeStatusToProcessor do
         subject
         expect(case_added_to_pending_at(c4s3)).to be_nil
       end
-
-      it 'should remove the case from the register' do
-        expect { subject }
-          .to change { case_register_with_pk(c4s3.id, register.id) }
-          .to(nil)
-      end
-
-      context 'when the case is not in a register' do
-        let!(:link) {}
-
-        it 'should raise RuntimeError' do
-          expect { subject }.to raise_error(RuntimeError)
-        end
-      end
-
-      context 'when the register contains only the case' do
-        it 'should delete the register' do
-          expect { subject }
-            .to change { registers.where(id: register.id).first }
-            .to(nil)
-        end
-      end
-
-      context 'when the register contains other cases' do
-        let(:another_case) { create(:case) }
-        let!(:another_link) { put_cases_into_register(register, another_case) }
-
-        it 'shouldn\'t delete the register' do
-          expect { subject }
-            .not_to change { registers.where(id: register.id).first }
-        end
-      end
-
-      context 'when another register contains the case' do
-        let(:register2) { create(:register) }
-        let!(:link2) { put_cases_into_register(register2, c4s3) }
-
-        it 'shouldn\'t remove the case from this older register' do
-          expect { subject }
-            .not_to change { case_register_with_pk(c4s3.id, register2.id) }
-        end
-      end
     end
 
     context 'when case status is switching from `pending` to `rejecting`' do
@@ -246,9 +150,7 @@ RSpec.describe MFCCase::EventProcessors::ChangeStatusToProcessor do
 
       let(:c4s3) { create_case(:pending, Time.now) }
       let(:added_to_rejecting_at) { nil }
-      let(:params) { { operator_id: '123', register_id: register.id } }
-      let(:register) { create(:register) }
-      let!(:link) { put_cases_into_register(register, c4s3) }
+      let(:params) { {} }
       let(:status) { 'rejecting' }
 
       it 'should set case status to `packaging`' do
@@ -258,48 +160,6 @@ RSpec.describe MFCCase::EventProcessors::ChangeStatusToProcessor do
       it 'should set `added_to_pending_at` case attribute to nil' do
         subject
         expect(case_added_to_pending_at(c4s3)).to be_nil
-      end
-
-      it 'should remove the case from the register' do
-        expect { subject }
-          .to change { case_register_with_pk(c4s3.id, register.id) }
-          .to(nil)
-      end
-
-      context 'when the case is not in a register' do
-        let!(:link) {}
-
-        it 'should raise RuntimeError' do
-          expect { subject }.to raise_error(RuntimeError)
-        end
-      end
-
-      context 'when the register contains only the case' do
-        it 'should delete the register' do
-          expect { subject }
-            .to change { registers.where(id: register.id).first }
-            .to(nil)
-        end
-      end
-
-      context 'when the register contains other cases' do
-        let(:another_case) { create(:case) }
-        let!(:another_link) { put_cases_into_register(register, another_case) }
-
-        it 'shouldn\'t delete the register' do
-          expect { subject }
-            .not_to change { registers.where(id: register.id).first }
-        end
-      end
-
-      context 'when another register contains the case' do
-        let(:register2) { create(:register) }
-        let!(:link2) { put_cases_into_register(register2, c4s3) }
-
-        it 'shouldn\'t remove the case from this older register' do
-          expect { subject }
-            .not_to change { case_register_with_pk(c4s3.id, register2.id) }
-        end
       end
     end
 

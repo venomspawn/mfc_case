@@ -50,7 +50,9 @@ module MFCCase
       PROCESSOR_CLASSES = {
         %w(packaging pending)   => AddToPendingListProcessor,
         %w(rejecting pending)   => AddToPendingListProcessor,
+        %w(pending closed)      => ExportAndCloseProcessor,
         %w(pending packaging)   => RemoveFromPendingListProcessor,
+        %w(pending processing)  => ExportToProcessProcessor,
         %w(pending rejecting)   => RemoveFromPendingListProcessor,
         %w(processing issuance) => SendToFrontOfficeProcessor,
         %w(issuance closed)     => IssueProcessor,

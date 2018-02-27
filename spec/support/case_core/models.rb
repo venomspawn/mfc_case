@@ -83,31 +83,6 @@ module CaseCore
           array.map { |obj| obj[key] }
         end
 
-        # Возвращает ассоциативный массив, ключами которого являются значения
-        # экземпляров структуры по ключу, совпадающему со значением параметра
-        # `key`, а значениями — списки списков значений, полученные по ключам,
-        # совпадающим со значениями в списке `value_keys`
-        #
-        # @param [Symbol] key
-        #   название ключа, по значениям которого будет производиться
-        #   группировка
-        #
-        # @param [Array<Symbol>] value_keys
-        #   названия ключей, значения которого попадут в значения
-        #   ассоциативного массива
-        #
-        # @return [Hash]
-        #   результирующий ассоциативный массив
-        #
-        def select_hash_groups(key, value_keys)
-          offsets = value_keys.map(&model.members.method(:find_index))
-          array.each_with_object({}) do |obj, memo|
-            key_value = obj[key]
-            memo[key_value] ||= []
-            memo[key_value] << obj.values_at(*offsets)
-          end
-        end
-
         private
 
         # Список записей выборки
@@ -193,21 +168,6 @@ module CaseCore
           end
         end
 
-        # Ищет экземпляр структуры по предоставленным значениям полей и
-        # возвращает его в случае успешного нахождения. Если такой экземпляр
-        # невозможно найти, создаёт экземпляр структуры, помещает его в список
-        # `datalist` и возвращает его
-        #
-        # @param [Hash] hash
-        #   ассоциативный массив атрибутов экземпляра структуры
-        #
-        # @return [Object]
-        #   результирующий экземпляр
-        #
-        def find_or_create(hash)
-          where(hash).first || create(hash)
-        end
-
         # Возвращает выборку записей на основе точного совпадения значений
         # полей
         #
@@ -275,40 +235,5 @@ module CaseCore
 
     Case          = Model.new %i(id type created_at)
     CaseAttribute = Model.new %i(case_id name value)
-    CaseRegister  = Model.new %i(case_id register_id)
-
-    Register      = Model.new %i(
-                                  id
-                                  institution_rguid
-                                  office_id
-                                  back_office_id
-                                  register_type
-                                  exported
-                                  exporter_id
-                                  exported_at
-                                )
-
-    class Register
-      # Удаляет экземпляр из списка экземпляров
-      #
-      # @param [Struct] obj
-      #   экземпляр
-      #
-      def self.remove(obj)
-        super
-        CaseRegister.where(register_id: obj.id).delete if obj.is_a?(Register)
-      end
-
-      # Возвращает выборку всех записей заявок, ассоциированных с записью
-      # реестра
-      #
-      # @return [CaseCore::Models::Model::Dataset]
-      #   выборка всех записей заявок, ассоциированных с записью реестра
-      #
-      def cases_dataset
-        cases_ids = CaseRegister.where(register_id: id).select(:case_id)
-        Case.where(id: cases_ids)
-      end
-    end
   end
 end
