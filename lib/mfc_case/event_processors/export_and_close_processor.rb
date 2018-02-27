@@ -53,7 +53,6 @@ module MFCCase
       #
       def initialize(c4s3, params = nil)
         super(c4s3, ATTRS, ALLOWED_STATUSES, params)
-        check_attributes!
       end
 
       # Проверяет условия и обновляет атрибуты заявки

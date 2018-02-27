@@ -305,5 +305,80 @@ RSpec.describe MFCCase::EventProcessors::ChangeStatusToProcessor do
         end
       end
     end
+
+    context 'when case status is switching from `pending` to `closed`' do
+      include MFCCase::EventProcessors::ExportAndCloseProcessor::SpecHelper
+
+      let(:c4s3) { create_case('pending', *args) }
+      let(:status) { 'closed' }
+      let(:args) { [issue_location_type, added_to_rejecting_at] }
+      let(:issue_location_type) { 'institution' }
+      let(:added_to_rejecting_at) { '' }
+      let(:params) { { operator_id: 'operator_id' } }
+
+      it 'should set case status to `closed`' do
+        expect { subject }.to change { case_status(c4s3) }.to('closed')
+      end
+
+      it 'should set `closed_at` case attribute to now' do
+        subject
+        expect(case_closed_at(c4s3)).to be_within(1).of(Time.now)
+      end
+
+      it 'should set `docs_sent_at` case attribute to now' do
+        subject
+        expect(case_docs_sent_at(c4s3)).to be_within(1).of(Time.now)
+      end
+
+      it 'should set `processor_person_id` attribute by params' do
+        subject
+        expect(case_processor_person_id(c4s3)).to be == params[:operator_id]
+      end
+
+      context 'when `issue_location_type` value isn\'t `institution`' do
+        let(:issue_location_type) { '' }
+
+        context 'when `added_to_rejecting_at` value isn\'t present' do
+          it 'should raise RuntimeError' do
+            expect { subject }.to raise_error(RuntimeError)
+          end
+        end
+      end
+    end
+
+    context 'when case status is switching from `pending` to `processing`' do
+      include MFCCase::EventProcessors::ExportToProcessProcessor::SpecHelper
+
+      let(:c4s3) { create_case('pending', *args) }
+      let(:status) { 'processing' }
+      let(:args) { [issue_location_type, added_to_rejecting_at] }
+      let(:issue_location_type) { 'institution' }
+      let(:added_to_rejecting_at) { '' }
+      let(:params) { { operator_id: 'operator_id' } }
+
+      it 'should set case status to `processing`' do
+        expect { subject }.to change { case_status(c4s3) }.to('processing')
+      end
+
+      it 'should set `docs_sent_at` case attribute to now' do
+        subject
+        expect(case_docs_sent_at(c4s3)).to be_within(1).of(Time.now)
+      end
+
+      it 'should set `processor_person_id` attribute by params' do
+        subject
+        expect(case_processor_person_id(c4s3)).to be == params[:operator_id]
+      end
+
+      context 'when `issue_location_type` value is `institution`' do
+        context 'when `added_to_rejecting_at` value is present' do
+          let(:added_to_rejecting_at) { Time.now }
+
+          it 'should raise RuntimeError' do
+            expect { subject }.to raise_error(RuntimeError)
+          end
+        end
+      end
+    end
   end
 end
