@@ -35,7 +35,7 @@ module MFCCase
   # @param [CaseCore::Models::Case] c4s3
   #   запись заявки
   #
-  # @param [Object] status
+  # @param [Object] state
   #   выставляемый статус заявки
   #
   # @param [NilClass, Hash] params
@@ -91,9 +91,9 @@ module MFCCase
   #   `institution`, а атрибут `added_to_rejecting_at` отсутствует или его
   #   значение пусто
   #
-  def self.change_status_to(c4s3, status, params)
+  def self.change_state_to(c4s3, state, params)
     processor =
-      EventProcessors::ChangeStatusToProcessor.new(c4s3, status, params)
+      EventProcessors::ChangeStateToProcessor.new(c4s3, state, params)
     processor.process
   end
 end

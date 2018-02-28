@@ -19,7 +19,7 @@ module MFCCase
           # Класс ошибок, сигнализирующих о том, что статус записи заявки не
           # пуст
           #
-          class BadStatus < RuntimeError
+          class BadState < RuntimeError
             # Инициализирует объект класса
             #
             # @param [CaseCore::Models::Case] c4s3

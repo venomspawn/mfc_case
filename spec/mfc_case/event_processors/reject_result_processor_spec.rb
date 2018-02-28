@@ -44,7 +44,7 @@ RSpec.describe MFCCase::EventProcessors::RejectResultProcessor do
       end
     end
 
-    context 'when case status is absent' do
+    context 'when case state is absent' do
       let(:c4s3) { create(:case, type: :mfc_case) }
 
       it 'should raise RuntimeError' do
@@ -52,7 +52,7 @@ RSpec.describe MFCCase::EventProcessors::RejectResultProcessor do
       end
     end
 
-    context 'when case status is nil' do
+    context 'when case state is nil' do
       let(:c4s3) { create_case(nil, Time.now) }
 
       it 'should raise RuntimeError' do
@@ -60,7 +60,7 @@ RSpec.describe MFCCase::EventProcessors::RejectResultProcessor do
       end
     end
 
-    context 'when case status is not `issuance`' do
+    context 'when case state is not `issuance`' do
       let(:c4s3) { create_case('closed', Time.now) }
 
       it 'should raise RuntimeError' do
@@ -95,8 +95,8 @@ RSpec.describe MFCCase::EventProcessors::RejectResultProcessor do
     let(:rejecting_expected_at) { Time.now - 24 * 60 * 60 }
     let(:params) { {} }
 
-    it 'should set case status to `rejecting`' do
-      expect { subject }.to change { case_status(c4s3) }.to('rejecting')
+    it 'should set case state to `rejecting`' do
+      expect { subject }.to change { case_state(c4s3) }.to('rejecting')
     end
 
     it 'should set `added_to_rejecting_at` case attribute to now' do
@@ -107,7 +107,7 @@ RSpec.describe MFCCase::EventProcessors::RejectResultProcessor do
     context 'when `rejecting_expected_at` attribute is absent' do
       let(:c4s3) { create(:case, type: 'mfc_case') }
       let!(:attrs) { create(:case_attributes, **args) }
-      let(:args) { { case_id: c4s3.id, status: 'issuance' } }
+      let(:args) { { case_id: c4s3.id, state: 'issuance' } }
 
       it 'should raise ArgumentError' do
         expect { subject }.to raise_error(ArgumentError)

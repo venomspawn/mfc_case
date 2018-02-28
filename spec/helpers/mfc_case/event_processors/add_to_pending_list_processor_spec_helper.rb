@@ -10,16 +10,16 @@ module MFCCase
     module AddToPendingListProcessorSpecHelper
       # Создаёт запись заявки с необходимыми атрибутами
       #
-      # @param [Object] status
+      # @param [Object] state
       #   статус заявки
       #
       # @return [CaseCore::Models::Case]
       #   созданная запись заявки
       #
-      def create_case(status)
+      def create_case(state)
         FactoryGirl.create(:case, type: 'mfc_case').tap do |c4s3|
           attributes = {
-            status:            status,
+            state:            state,
             institution_rguid: FactoryGirl.create(:string),
             back_office_id:    FactoryGirl.create(:string)
           }
@@ -50,17 +50,17 @@ module MFCCase
         case_attributes(c4s3.id)[:added_to_pending_at]
       end
 
-      # Возвращает значение атрибута `status` заявки
+      # Возвращает значение атрибута `state` заявки
       #
       # @param [CaseCore::Models::Case] c4s3
       #   запись заявки
       #
       # @return [NilClass, String]
-      #   значение атрибута `status` или `nil`, если атрибут отсутствует или
+      #   значение атрибута `state` или `nil`, если атрибут отсутствует или
       #   его значение пусто
       #
-      def case_status(c4s3)
-        case_attributes(c4s3.id)[:status]
+      def case_state(c4s3)
+        case_attributes(c4s3.id)[:state]
       end
     end
   end

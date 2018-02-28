@@ -57,16 +57,16 @@ module MFCCase
           # Проверяет, что аргумент является объектом класса `NilClass` или
           # класса `Array`
           #
-          # @params [Hash] allowed_statuses
+          # @params [Hash] allowed_states
           #   аргумент
           #
           # @raise [ArgumentError]
           #   если аргумент не является ни объектом класса `NilClass`, ни
           #   объектом класса `Array`
           #
-          def check_allowed_statuses!(allowed_statuses)
-            return if allowed_statuses.nil? || allowed_statuses.is_a?(Array)
-            raise Errors::AllowedStatuses::InvalidClass
+          def check_allowed_states!(allowed_states)
+            return if allowed_states.nil? || allowed_states.is_a?(Array)
+            raise Errors::AllowedStates::InvalidClass
           end
 
           # Проверяет, что аргумент является объектом класса `NilClass` или
@@ -84,7 +84,7 @@ module MFCCase
             raise Errors::Params::InvalidClass
           end
 
-          # Проверяет, что значение атрибута `status` заявки допустимо
+          # Проверяет, что значение атрибута `state` заявки допустимо
           #
           # @param [CaseCore::Models::Case] c4s3
           #   запись заявки
@@ -92,19 +92,19 @@ module MFCCase
           # @param [Hash] case_attributes
           #   ассоциативный массив атрибутов заявки
           #
-          # @param [NilClass, Array] allowed_statuses
+          # @param [NilClass, Array] allowed_states
           #   список статусов заявки, которые допустимы для данного
           #   обработчика, или `nil`, если допустим любой статус, а также его
           #
           # @raise [RuntimeError]
-          #   если значение атрибута `status` не является допустимым
+          #   если значение атрибута `state` не является допустимым
           #
-          def check_case_status!(c4s3, case_attributes, allowed_statuses)
-            return if allowed_statuses.nil?
-            status = case_attributes[:status]
-            allowed_statuses.map!(&:to_s)
-            return if allowed_statuses.include?(status)
-            raise Errors::Case::BadStatus.new(c4s3, status, allowed_statuses)
+          def check_case_state!(c4s3, case_attributes, allowed_states)
+            return if allowed_states.nil?
+            state = case_attributes[:state]
+            allowed_states.map!(&:to_s)
+            return if allowed_states.include?(state)
+            raise Errors::Case::BadState.new(c4s3, state, allowed_states)
           end
         end
       end

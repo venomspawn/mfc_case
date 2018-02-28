@@ -45,7 +45,7 @@ RSpec.describe MFCCase::EventProcessors::SendToFrontOfficeProcessor do
       end
     end
 
-    context 'when case status is absent' do
+    context 'when case state is absent' do
       let(:c4s3) { create(:case, type: :mfc_case) }
 
       it 'should raise RuntimeError' do
@@ -53,7 +53,7 @@ RSpec.describe MFCCase::EventProcessors::SendToFrontOfficeProcessor do
       end
     end
 
-    context 'when case status is nil' do
+    context 'when case state is nil' do
       let(:c4s3) { create_case(nil) }
 
       it 'should raise RuntimeError' do
@@ -61,7 +61,7 @@ RSpec.describe MFCCase::EventProcessors::SendToFrontOfficeProcessor do
       end
     end
 
-    context 'when case status is not `processing`' do
+    context 'when case state is not `processing`' do
       let(:c4s3) { create_case(:closed) }
 
       it 'should raise RuntimeError' do
@@ -95,8 +95,8 @@ RSpec.describe MFCCase::EventProcessors::SendToFrontOfficeProcessor do
     let(:c4s3) { create_case(:processing) }
     let(:params) { { operator_id: 'operator_id', result_id: 'result_id' } }
 
-    it 'should set case status to `issuance`' do
-      expect { subject }.to change { case_status(c4s3) }.to('issuance')
+    it 'should set case state to `issuance`' do
+      expect { subject }.to change { case_state(c4s3) }.to('issuance')
     end
 
     it 'should set `responded_at` case attribute to now' do

@@ -45,7 +45,7 @@ RSpec.describe MFCCase::EventProcessors::AddToPendingListProcessor do
       end
     end
 
-    context 'when case status is absent' do
+    context 'when case state is absent' do
       let(:c4s3) { create(:case, type: :mfc_case) }
 
       it 'should raise RuntimeError' do
@@ -53,7 +53,7 @@ RSpec.describe MFCCase::EventProcessors::AddToPendingListProcessor do
       end
     end
 
-    context 'when case status is nil' do
+    context 'when case state is nil' do
       let(:c4s3) { create_case(nil) }
 
       it 'should raise RuntimeError' do
@@ -61,7 +61,7 @@ RSpec.describe MFCCase::EventProcessors::AddToPendingListProcessor do
       end
     end
 
-    context 'when case status is not `packaging` nor `rejecting`' do
+    context 'when case state is not `packaging` nor `rejecting`' do
       let(:c4s3) { create_case('closed') }
 
       it 'should raise RuntimeError' do
@@ -92,15 +92,15 @@ RSpec.describe MFCCase::EventProcessors::AddToPendingListProcessor do
     subject { instance.process }
 
     let(:instance) { described_class.new(c4s3, params) }
-    let(:c4s3) { create_case(status) }
+    let(:c4s3) { create_case(state) }
     let(:params) { { office_id: office_id } }
     let(:office_id) { create(:string) }
 
-    context 'when case status is `packaging`' do
-      let(:status) { 'packaging' }
+    context 'when case state is `packaging`' do
+      let(:state) { 'packaging' }
 
-      it 'should set case status to `pending`' do
-        expect { subject }.to change { case_status(c4s3) }.to('pending')
+      it 'should set case state to `pending`' do
+        expect { subject }.to change { case_state(c4s3) }.to('pending')
       end
 
       it 'should set `added_to_pending_at` attribute to current time' do
@@ -109,11 +109,11 @@ RSpec.describe MFCCase::EventProcessors::AddToPendingListProcessor do
       end
     end
 
-    context 'when case status is `rejecting`' do
-      let(:status) { 'rejecting' }
+    context 'when case state is `rejecting`' do
+      let(:state) { 'rejecting' }
 
-      it 'should set case status to `pending`' do
-        expect { subject }.to change { case_status(c4s3) }.to('pending')
+      it 'should set case state to `pending`' do
+        expect { subject }.to change { case_state(c4s3) }.to('pending')
       end
 
       it 'should set `added_to_pending_at` attribute to current time' do

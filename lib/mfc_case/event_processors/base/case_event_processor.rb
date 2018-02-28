@@ -27,7 +27,7 @@ module MFCCase
         #   список названий извлекаемых атрибутов или `nil`, если нужно извлечь
         #   все атрибуты
         #
-        # @param [NilClass, Array] allowed_statuses
+        # @param [NilClass, Array] allowed_states
         #   список статусов заявки, которые допустимы для данного обработчика,
         #   или `nil`, если допустим любой статус, а также его отсутствие
         #
@@ -44,7 +44,7 @@ module MFCCase
         #   объектом класса `Array`
         #
         # @raise [ArgumentError]
-        #   если аргумент `allowed_statuses` не является ни объектом класса
+        #   если аргумент `allowed_states` не является ни объектом класса
         #   `NilClass`, ни объектом класса `Array`
         #
         # @raise [ArgumentError]
@@ -58,19 +58,19 @@ module MFCCase
         #   если заявка обладает статусом, который недопустим для данного
         #   обработчика
         #
-        def initialize(c4s3, attrs = [], allowed_statuses = nil, params = nil)
+        def initialize(c4s3, attrs = [], allowed_states = nil, params = nil)
           check_case!(c4s3)
           check_case_type!(c4s3)
           check_attrs!(attrs)
-          check_allowed_statuses!(allowed_statuses)
+          check_allowed_states!(allowed_states)
           check_params!(params)
 
-          attrs = sanitize_attrs(attrs, allowed_statuses)
+          attrs = sanitize_attrs(attrs, allowed_states)
 
           @c4s3 = c4s3
           @case_attributes = extract_case_attributes(attrs)
 
-          check_case_status!(c4s3, case_attributes, allowed_statuses)
+          check_case_state!(c4s3, case_attributes, allowed_states)
 
           @params = params || {}
         end
@@ -112,7 +112,7 @@ module MFCCase
         #   список названий извлекаемых атрибутов или `nil`, если нужно извлечь
         #   все атрибуты
         #
-        # @param [NilClass, Array] allowed_statuses
+        # @param [NilClass, Array] allowed_states
         #   список статусов заявки, которые допустимы для данного обработчика,
         #   или `nil`, если допустим любой статус, а также его отсутствие
         #
@@ -122,9 +122,9 @@ module MFCCase
         # @return [Array]
         #   если аргумент `attrs` является списком
         #
-        def sanitize_attrs(attrs, allowed_statuses)
+        def sanitize_attrs(attrs, allowed_states)
           return if attrs.nil?
-          attrs += ['status'] if allowed_statuses.is_a?(Array)
+          attrs += ['state'] if allowed_states.is_a?(Array)
           attrs.uniq
         end
 

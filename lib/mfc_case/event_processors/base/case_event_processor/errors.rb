@@ -54,25 +54,25 @@ module MFCCase
             # @author Александр Ильчуков <a.s.ilchukov@cit.rkomi.ru>
             #
             # Класс исключений, сигнализирующих о том, что значение атрибута
-            # `status` заявки не является допустимым
+            # `state` заявки не является допустимым
             #
-            class BadStatus < RuntimeError
+            class BadState < RuntimeError
               # Инициализирует объект класса
               #
               # @param [CaseCore::Models::Case] c4s3
               #   запись заявки
               #
-              # @param [#to_s] status
+              # @param [#to_s] state
               #   статус заявки
               #
-              # @param [Array] allowed_statuses
+              # @param [Array] allowed_states
               #   список допустимых статусов заявки
               #
-              def initialize(c4s3, status, allowed_statuses)
+              def initialize(c4s3, state, allowed_states)
                 super(<<-MESSAGE.squish)
-                  Статус `#{status}` заявки с идентификатором записи
+                  Статус `#{state}` заявки с идентификатором записи
                   `#{c4s3.id}` не находится среди следующих допустимых
-                  статусов: `#{allowed_statuses.join('`, `')}`
+                  статусов: `#{allowed_states.join('`, `')}`
                 MESSAGE
               end
             end
@@ -105,13 +105,13 @@ module MFCCase
           # @author Александр Ильчуков <a.s.ilchukov@cit.rkomi.ru>
           #
           # Пространство имён исключений, связанных с аргументом
-          # `allowed_statuses` конструктора содержащего класса
+          # `allowed_states` конструктора содержащего класса
           #
-          module AllowedStatuses
+          module AllowedStates
             # @author Александр Ильчуков <a.s.ilchukov@cit.rkomi.ru>
             #
             # Класс исключений, сигнализирующих о том, что аргумент
-            # `allowed_statuses` конструктора содержащего класса не является ни
+            # `allowed_states` конструктора содержащего класса не является ни
             # объектом класса `NilClass`, ни объектом класса `Array`
             #
             class InvalidClass < ArgumentError
@@ -119,7 +119,7 @@ module MFCCase
               #
               def initialize
                 super(<<-MESSAGE.squish)
-                  Аргумент `allowed_statuses` не является ни объектом класса
+                  Аргумент `allowed_states` не является ни объектом класса
                   `NilClass`, ни объектом класса `Array`
                 MESSAGE
               end

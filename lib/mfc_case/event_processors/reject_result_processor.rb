@@ -29,7 +29,7 @@ module MFCCase
 
       # Список названий извлекаемых атрибутов заявки
       #
-      ATTRS = %w(rejecting_expected_at) # + атрибут `status`
+      ATTRS = %w(rejecting_expected_at) # + атрибут `state`
 
       # Инициализирует объект класса
       #
@@ -82,7 +82,7 @@ module MFCCase
       #   ассоциативный массив обновлённых атрибутов заявки
       #
       def new_case_attributes
-        { status: 'rejecting', added_to_rejecting_at: now }
+        { state: 'rejecting', added_to_rejecting_at: now }
       end
 
       # Проверяет условия выставления нового статуса

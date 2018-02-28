@@ -45,7 +45,7 @@ RSpec.describe MFCCase::EventProcessors::ExportAndCloseProcessor do
       end
     end
 
-    context 'when case status is absent' do
+    context 'when case state is absent' do
       let(:c4s3) { create(:case, type: :mfc_case) }
 
       it 'should raise RuntimeError' do
@@ -53,7 +53,7 @@ RSpec.describe MFCCase::EventProcessors::ExportAndCloseProcessor do
       end
     end
 
-    context 'when case status is nil' do
+    context 'when case state is nil' do
       let(:c4s3) { create_case(nil, 'institution', '') }
 
       it 'should raise RuntimeError' do
@@ -61,7 +61,7 @@ RSpec.describe MFCCase::EventProcessors::ExportAndCloseProcessor do
       end
     end
 
-    context 'when case status is not `pending`' do
+    context 'when case state is not `pending`' do
       let(:c4s3) { create_case(:closed, 'institution', '') }
 
       it 'should raise RuntimeError' do
@@ -98,8 +98,8 @@ RSpec.describe MFCCase::EventProcessors::ExportAndCloseProcessor do
     let(:added_to_rejecting_at) { '' }
     let(:params) { { operator_id: 'operator_id' } }
 
-    it 'should set case status to `closed`' do
-      expect { subject }.to change { case_status(c4s3) }.to('closed')
+    it 'should set case state to `closed`' do
+      expect { subject }.to change { case_state(c4s3) }.to('closed')
     end
 
     it 'should set `closed_at` case attribute to now' do

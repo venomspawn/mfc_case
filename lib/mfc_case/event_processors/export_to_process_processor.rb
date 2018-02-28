@@ -28,7 +28,7 @@ module MFCCase
 
       # Список названий извлекаемых атрибутов заявки
       #
-      ATTRS = %w(issue_location_type added_to_rejecting_at) # + `status`
+      ATTRS = %w(issue_location_type added_to_rejecting_at) # + `state`
 
       # Инициализирует объект класса
       #
@@ -79,7 +79,7 @@ module MFCCase
       #
       def new_case_attributes
         {
-          status:              'processing',
+          state:              'processing',
           docs_sent_at:        now,
           processor_person_id: person_id
         }
