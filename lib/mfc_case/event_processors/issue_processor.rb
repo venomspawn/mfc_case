@@ -23,7 +23,7 @@ module MFCCase
 
       # Список названий извлекаемых атрибутов заявки
       #
-      ATTRS = %w(rejecting_expected_at) # + атрибут `status`
+      ATTRS = %w(rejecting_expected_at) # + атрибут `state`
 
       # Инициализирует объект класса
       #
@@ -77,7 +77,7 @@ module MFCCase
       #
       def new_case_attributes
         {
-          status:           'closed',
+          state:           'closed',
           closed_at:        now,
           issuer_person_id: person_id,
           issued_at:        now

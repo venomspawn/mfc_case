@@ -3,12 +3,12 @@
 # @author Александр Ильчуков <a.s.ilchukov@cit.rkomi.ru>
 #
 # Файл тестирования класса
-# `MFCCase::EventProcessors::SendToFrontOfficeProcessor` обработчиков события
-# `send_to_frontoffice` заявки на неавтоматизированную услугу
+# `MFCCase::EventProcessors::ExportToProcessProcessor` обработчиков события
+# `export_to_process` заявки на неавтоматизированную услугу
 #
 
-RSpec.describe MFCCase::EventProcessors::SendToFrontOfficeProcessor do
-  include MFCCase::EventProcessors::SendToFrontOfficeProcessorSpecHelper
+RSpec.describe MFCCase::EventProcessors::ExportToProcessProcessor do
+  include described_class::SpecHelper
 
   describe 'the class' do
     subject { described_class }
@@ -24,7 +24,7 @@ RSpec.describe MFCCase::EventProcessors::SendToFrontOfficeProcessor do
     describe 'result' do
       subject { result }
 
-      let(:c4s3) { create_case(:processing) }
+      let(:c4s3) { create_case('pending', 'institution', '') }
 
       it { is_expected.to be_an_instance_of(described_class) }
     end
@@ -54,15 +54,15 @@ RSpec.describe MFCCase::EventProcessors::SendToFrontOfficeProcessor do
     end
 
     context 'when case state is nil' do
-      let(:c4s3) { create_case(nil) }
+      let(:c4s3) { create_case(nil, 'institution', '') }
 
       it 'should raise RuntimeError' do
         expect { subject }.to raise_error(RuntimeError)
       end
     end
 
-    context 'when case state is not `processing`' do
-      let(:c4s3) { create_case(:closed) }
+    context 'when case state is not `pending`' do
+      let(:c4s3) { create_case(:closed, 'institution', '') }
 
       it 'should raise RuntimeError' do
         expect { subject }.to raise_error(RuntimeError)
@@ -71,7 +71,7 @@ RSpec.describe MFCCase::EventProcessors::SendToFrontOfficeProcessor do
 
     context 'when `params` argument is not of `NilClass` nor of `Hash` type' do
       let(:params) { 'not of `NilClass` nor of `Hash` type' }
-      let(:c4s3) { create_case('packaging', Time.now) }
+      let(:c4s3) { create_case('pending', 'institution', '') }
 
       it 'should raise ArgumentError' do
         expect { subject }.to raise_error(ArgumentError)
@@ -82,7 +82,7 @@ RSpec.describe MFCCase::EventProcessors::SendToFrontOfficeProcessor do
   describe 'instance' do
     subject { described_class.new(c4s3, params) }
 
-    let(:c4s3) { create_case(:processing) }
+    let(:c4s3) { create_case('pending', 'institution', '') }
     let(:params) { {} }
 
     it { is_expected.to respond_to(:process) }
@@ -92,27 +92,34 @@ RSpec.describe MFCCase::EventProcessors::SendToFrontOfficeProcessor do
     subject { instance.process }
 
     let(:instance) { described_class.new(c4s3, params) }
-    let(:c4s3) { create_case(:processing) }
-    let(:params) { { operator_id: 'operator_id', result_id: 'result_id' } }
+    let(:c4s3) { create_case('pending', *args) }
+    let(:args) { [issue_location_type, added_to_rejecting_at] }
+    let(:issue_location_type) { 'institution' }
+    let(:added_to_rejecting_at) { '' }
+    let(:params) { { operator_id: 'operator_id' } }
 
-    it 'should set case state to `issuance`' do
-      expect { subject }.to change { case_state(c4s3) }.to('issuance')
+    it 'should set case state to `processing`' do
+      expect { subject }.to change { case_state(c4s3) }.to('processing')
     end
 
-    it 'should set `responded_at` case attribute to now' do
+    it 'should set `docs_sent_at` case attribute to now' do
       subject
-      expect(case_responded_at(c4s3)).to be_within(1).of(Time.now)
+      expect(case_docs_sent_at(c4s3)).to be_within(1).of(Time.now)
     end
 
-    it 'should set `response_processor_person_id` attribute by params' do
+    it 'should set `processor_person_id` attribute by params' do
       subject
-      expect(case_response_processor_person_id(c4s3))
-        .to be == params[:operator_id]
+      expect(case_processor_person_id(c4s3)).to be == params[:operator_id]
     end
 
-    it 'should set `result_id` attribute by params' do
-      subject
-      expect(case_result_id(c4s3)).to be == params[:result_id]
+    context 'when `issue_location_type` value is `institution`' do
+      context 'when `added_to_rejecting_at` value is present' do
+        let(:added_to_rejecting_at) { Time.now }
+
+        it 'should raise RuntimeError' do
+          expect { subject }.to raise_error(RuntimeError)
+        end
+      end
     end
   end
 end

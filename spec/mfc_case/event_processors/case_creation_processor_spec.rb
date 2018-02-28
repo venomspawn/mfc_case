@@ -42,10 +42,10 @@ RSpec.describe MFCCase::EventProcessors::CaseCreationProcessor do
       end
     end
 
-    context 'when case status is present' do
+    context 'when case state is present' do
       let(:c4s3) { create(:case, type: 'mfc_case') }
       let!(:case_attribute) { create(:case_attribute, *traits) }
-      let(:traits) { [case_id: c4s3.id, name: 'status', value: 'status'] }
+      let(:traits) { [case_id: c4s3.id, name: 'state', value: 'state'] }
 
       it 'should raise RuntimeError' do
         expect { subject }.to raise_error(RuntimeError)
@@ -67,8 +67,8 @@ RSpec.describe MFCCase::EventProcessors::CaseCreationProcessor do
     let(:instance) { described_class.new(c4s3) }
     let(:c4s3) { create(:case, type: 'mfc_case') }
 
-    it 'should set case status to `packaging`' do
-      expect { subject }.to change { case_status(c4s3) }.to('packaging')
+    it 'should set case state to `packaging`' do
+      expect { subject }.to change { case_state(c4s3) }.to('packaging')
     end
   end
 end

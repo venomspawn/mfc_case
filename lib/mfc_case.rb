@@ -35,7 +35,7 @@ module MFCCase
   # @param [CaseCore::Models::Case] c4s3
   #   запись заявки
   #
-  # @param [Object] status
+  # @param [Object] state
   #   выставляемый статус заявки
   #
   # @param [NilClass, Hash] params
@@ -72,75 +72,28 @@ module MFCCase
   # @raise [RuntimeError]
   #   если заявка переходит из статуса `processing` в статус `issuance`, но
   #   текущая дата больше значения, записанного в атрибуте
-  #   `rejecting_expected_at`;
+  #   `rejecting_expected_at`
   #
   # @raise [RuntimeError]
   #   если заявка переходит из статуса `issuance` в статус `rejecting`, но
   #   текущая дата не больше значения, записанного в атрибуте
-  #   `rejecting_expected_at`;
+  #   `rejecting_expected_at`
   #
-  def self.change_status_to(c4s3, status, params)
+  # @raise [RuntimeError]
+  #   если заявка переходит из статуса `pending` в статус `processing`, но либо
+  #   атрибут `issue_location_type` присутствует и его значение равно
+  #   `institution`, либо атрибут `added_to_rejecting_at` присутствует и его
+  #   значение непусто
+  #
+  # @raise [RuntimeError]
+  #   если заявка переходит из статуса `pending` в статус `closed`, но
+  #   атрибут `issue_location_type` отсутствует или его значение не равно
+  #   `institution`, а атрибут `added_to_rejecting_at` отсутствует или его
+  #   значение пусто
+  #
+  def self.change_state_to(c4s3, state, params)
     processor =
-      EventProcessors::ChangeStatusToProcessor.new(c4s3, status, params)
-    processor.process
-  end
-
-  # Выполняет следующие действия:
-  #
-  # *   выставляет значение поля `exported` записи реестра передаваемой
-  #     корреспонденции равным `true`;
-  # *   выставляет значение поля `exported_at` записи реестра передаваемой
-  #     корреспонденции равным текущим дате и времени;
-  # *   выставляет значение поля `exporter_id` записи реестра передаваемой
-  #     корреспонденции равным значению параметру `exporter_id`;
-  # *   у каждой записи заявки, прикреплённой к записи реестра передаваемой
-  #     корреспонденции выполняет следующие действия:
-  #
-  #     +   выставляет статус заявки `processing` в том и только в том
-  #         случае, если одновременно выполнены следующие условия:
-  #
-  #         -   статус заявки `pending`;
-  #         -   значение атрибута `issue_location_type` не равно
-  #             `institution`;
-  #         -   значение атрибута `added_to_rejecting_at` отсутствует или
-  #             пусто;
-  #
-  #     +   выставляет статус заявки `closed` в том и только в том случае,
-  #         если одновременно выполнены следующие условия:
-  #
-  #         -   статус заявки `pending`;
-  #         -   значение атрибута `issue_location_type` равно `institution`,
-  #             или значение атрибута `added_to_rejecting_at` присутствует;
-  #
-  #     +   выставляет значение атрибута `docs_sent_at` равным текущему
-  #         времени;
-  #     +   выставляет значение атрибута `processor_person_id` равным
-  #         значению дополнительного параметра `operator_id`.
-  #
-  # @param [CaseCore::Models::Register] register
-  #   запись реестра передаваемой корреспонденции
-  #
-  # @param [NilClass, Hash] params
-  #   ассоциативный массив параметров или `nil`
-  #
-  # @raise [ArgumentError]
-  #   если аргумент `register` не является объектом класса
-  #   `CaseCore::Models::Register`
-  #
-  # @raise [ArgumentError]
-  #   если аргумент `params` не является ни объектом класса `NilClass`, ни
-  #   объектом класса `Hash`
-  #
-  # @raise [RuntimeError]
-  #   если значение поля `type` записи заявки не равно `mfc_case`
-  #
-  # @raise [RuntimeError]
-  #   если среди записей заявок, прикреплённых к записи реестра передаваемой
-  #   корреспонденции, нашлась запись со значением атрибута`status`, который не
-  #   равен `pending`, или без атрибута `status`
-  #
-  def self.export_register(register, params)
-    processor = EventProcessors::ExportRegisterProcessor.new(register, params)
+      EventProcessors::ChangeStateToProcessor.new(c4s3, state, params)
     processor.process
   end
 end
