@@ -45,7 +45,7 @@ RSpec.describe MFCCase::EventProcessors::RemoveFromPendingListProcessor do
       end
     end
 
-    context 'when case status is absent' do
+    context 'when case state is absent' do
       let(:c4s3) { create(:case, type: :mfc_case) }
 
       it 'should raise RuntimeError' do
@@ -53,7 +53,7 @@ RSpec.describe MFCCase::EventProcessors::RemoveFromPendingListProcessor do
       end
     end
 
-    context 'when case status is nil' do
+    context 'when case state is nil' do
       let(:c4s3) { create_case(nil, nil) }
 
       it 'should raise RuntimeError' do
@@ -61,7 +61,7 @@ RSpec.describe MFCCase::EventProcessors::RemoveFromPendingListProcessor do
       end
     end
 
-    context 'when case status is not `pending`' do
+    context 'when case state is not `pending`' do
       let(:c4s3) { create_case(:closed, nil) }
 
       it 'should raise RuntimeError' do
@@ -99,14 +99,14 @@ RSpec.describe MFCCase::EventProcessors::RemoveFromPendingListProcessor do
     context 'when `added_to_rejecting_at` case attribute is present' do
       let(:added_to_rejecting_at) { Time.now }
 
-      it 'should set case status to `rejecting`' do
-        expect { subject }.to change { case_status(c4s3) }.to('rejecting')
+      it 'should set case state to `rejecting`' do
+        expect { subject }.to change { case_state(c4s3) }.to('rejecting')
       end
     end
 
     context 'when `added_to_rejecting_at` case attribute is absent or nil' do
-      it 'should set case status to `packaging`' do
-        expect { subject }.to change { case_status(c4s3) }.to('packaging')
+      it 'should set case state to `packaging`' do
+        expect { subject }.to change { case_state(c4s3) }.to('packaging')
       end
     end
 

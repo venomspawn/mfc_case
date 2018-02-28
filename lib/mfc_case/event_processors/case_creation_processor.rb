@@ -35,10 +35,10 @@ module MFCCase
       #   ассоциативный массив обновлённых атрибутов заявки
       #
       def new_case_attributes
-        { status: 'packaging' }
+        { state: 'packaging' }
       end
 
-      # Проверяет, что значение атрибута `status` заявки допустимо
+      # Проверяет, что значение атрибута `state` заявки допустимо
       #
       # @param [CaseCore::Models::Case] c4s3
       #   запись заявки
@@ -46,15 +46,15 @@ module MFCCase
       # @param [Hash] case_attributes
       #   ассоциативный массив атрибутов заявки
       #
-      # @param [Array] _allowed_statuses
+      # @param [Array] _allowed_states
       #   информация о допустимых статусах
       #
       # @raise [RuntimeError]
       #   если заявка обладает выставленным статусом
       #
-      def check_case_status!(c4s3, case_attributes, _allowed_statuses)
-        status = case_attributes[:status]
-        raise Errors::Case::BadStatus.new(c4s3) unless status.blank?
+      def check_case_state!(c4s3, case_attributes, _allowed_states)
+        state = case_attributes[:state]
+        raise Errors::Case::BadState.new(c4s3) unless state.blank?
       end
     end
   end

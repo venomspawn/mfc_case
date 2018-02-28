@@ -23,7 +23,7 @@ module MFCCase
 
       # Список названий извлекаемых атрибутов заявки
       #
-      ATTRS = [] # Не извлекаются никакие атрибуты, кроме атрибута `status`
+      ATTRS = [] # Не извлекаются никакие атрибуты, кроме атрибута `state`
 
       # Инициализирует объект класса
       #
@@ -62,7 +62,7 @@ module MFCCase
       #
       def new_case_attributes
         {
-          status:                       'issuance',
+          state:                       'issuance',
           responded_at:                 now,
           response_processor_person_id: person_id,
           result_id:                    result_id

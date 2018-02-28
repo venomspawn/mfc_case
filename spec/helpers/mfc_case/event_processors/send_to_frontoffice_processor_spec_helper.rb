@@ -10,15 +10,15 @@ module MFCCase
     module SendToFrontOfficeProcessorSpecHelper
       # Создаёт запись заявки с необходимыми атрибутами
       #
-      # @param [Object] status
+      # @param [Object] state
       #   статус заявки
       #
       # @return [CaseCore::Models::Case]
       #   созданная запись заявки
       #
-      def create_case(status)
+      def create_case(state)
         FactoryGirl.create(:case, type: 'mfc_case').tap do |c4s3|
-          args = { case_id: c4s3.id, status: status.to_s }
+          args = { case_id: c4s3.id, state: state.to_s }
           FactoryGirl.create(:case_attributes, **args)
         end
       end
@@ -33,17 +33,17 @@ module MFCCase
         CaseCore::Actions::Cases.show_attributes(id: case_id)
       end
 
-      # Возвращает значение атрибута `status` заявки
+      # Возвращает значение атрибута `state` заявки
       #
       # @param [CaseCore::Models::Case] c4s3
       #   запись заявки
       #
       # @return [NilClass, String]
-      #   значение атрибута `status` или `nil`, если атрибут отсутствует или
+      #   значение атрибута `state` или `nil`, если атрибут отсутствует или
       #   его значение пусто
       #
-      def case_status(c4s3)
-        case_attributes(c4s3.id).dig(:status)
+      def case_state(c4s3)
+        case_attributes(c4s3.id).dig(:state)
       end
 
       # Возвращает значение атрибута `responded_at` заявки

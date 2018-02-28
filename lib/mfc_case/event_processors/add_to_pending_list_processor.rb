@@ -19,7 +19,7 @@ module MFCCase
 
       # Список названий извлекаемых атрибутов заявки
       #
-      ATTRS = [] # + `status`
+      ATTRS = [] # + `state`
 
       # Инициализирует объект класса
       #
@@ -57,7 +57,7 @@ module MFCCase
       #   ассоциативный массив обновлённых атрибутов заявки
       #
       def new_case_attributes
-        { status: 'pending', added_to_pending_at: now }
+        { state: 'pending', added_to_pending_at: now }
       end
     end
   end

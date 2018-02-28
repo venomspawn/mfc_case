@@ -22,7 +22,7 @@ module MFCCase
 
       # Список названий извлекаемых атрибутов заявки
       #
-      ATTRS = %w(added_to_rejecting_at) # + `status`
+      ATTRS = %w(added_to_rejecting_at) # + `state`
 
       # Инициализирует объект класса
       #
@@ -60,7 +60,7 @@ module MFCCase
       #   ассоциативный массив обновлённых атрибутов заявки
       #
       def new_case_attributes
-        { status: new_status, added_to_pending_at: nil }
+        { state: new_state, added_to_pending_at: nil }
       end
 
       # Возвращает новый статус заявки
@@ -68,7 +68,7 @@ module MFCCase
       # @return [String]
       #   новый статус заявки
       #
-      def new_status
+      def new_state
         added_to_rejecting_at = case_attributes[:added_to_rejecting_at]
         added_to_rejecting_at.present? ? 'rejecting' : 'packaging'
       end
