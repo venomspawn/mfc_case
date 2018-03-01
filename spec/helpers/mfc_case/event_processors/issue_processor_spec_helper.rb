@@ -22,7 +22,7 @@ module MFCCase
       def create_case(state, rejecting_expected_at)
         FactoryGirl.create(:case, type: 'mfc_case').tap do |c4s3|
           attributes = {
-            state:                state.to_s,
+            state:                 state.to_s,
             rejecting_expected_at: rejecting_expected_at
           }
           FactoryGirl.create(:case_attributes, case_id: c4s3.id, **attributes)
@@ -62,7 +62,8 @@ module MFCCase
       #   его значение пусто
       #
       def case_closed_at(c4s3)
-        case_attributes(c4s3.id).dig(:closed_at)
+        value = case_attributes(c4s3.id).dig(:closed_at)
+        value && Time.parse(value)
       end
 
       # Возвращает значение атрибута `issuer_person_id` заявки
@@ -88,7 +89,8 @@ module MFCCase
       #   его значение пусто
       #
       def case_issued_at(c4s3)
-        case_attributes(c4s3.id).dig(:issued_at)
+        value = case_attributes(c4s3.id).dig(:issued_at)
+        value && Time.parse(value)
       end
     end
   end

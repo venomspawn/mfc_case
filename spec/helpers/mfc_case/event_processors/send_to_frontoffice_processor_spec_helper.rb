@@ -56,7 +56,8 @@ module MFCCase
       #   или его значение пусто
       #
       def case_responded_at(c4s3)
-        case_attributes(c4s3.id).dig(:responded_at)
+        value = case_attributes(c4s3.id).dig(:responded_at)
+        value && Time.parse(value)
       end
 
       # Возвращает значение атрибута `response_processor_person_id` заявки

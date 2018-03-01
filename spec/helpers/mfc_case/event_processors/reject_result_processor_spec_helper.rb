@@ -62,7 +62,8 @@ module MFCCase
       #   отсутствует или его значение пусто
       #
       def case_added_to_rejecting_at(c4s3)
-        case_attributes(c4s3.id).dig(:added_to_rejecting_at)
+        value = case_attributes(c4s3.id).dig(:added_to_rejecting_at)
+        value && Time.parse(value)
       end
     end
   end

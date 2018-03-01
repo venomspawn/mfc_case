@@ -19,7 +19,7 @@ RSpec.describe MFCCase do
     context 'when `case` argument is not of `CaseCore::Models::Case` type' do
       let(:c4s3) { 'not of `CaseCore::Models::Case` type' }
       let(:state) { 'pending' }
-      let(:params) { nil }
+      let(:params) { {} }
 
       it 'should raise ArgumentError' do
         expect { subject }.to raise_error(ArgumentError)
@@ -29,7 +29,7 @@ RSpec.describe MFCCase do
     context 'when case type is wrong' do
       let(:c4s3) { create(:case, type: :wrong) }
       let(:state) { 'pending' }
-      let(:params) { nil }
+      let(:params) { {} }
 
       it 'should raise RuntimeError' do
         expect { subject }.to raise_error(RuntimeError)
@@ -39,7 +39,7 @@ RSpec.describe MFCCase do
     context 'when case state is absent' do
       let(:c4s3) { create(:case, type: 'mfc_case') }
       let(:state) { 'pending' }
-      let(:params) { nil }
+      let(:params) { {} }
 
       it 'should raise RuntimeError' do
         expect { subject }.to raise_error(RuntimeError)
@@ -63,7 +63,7 @@ RSpec.describe MFCCase do
       let!(:case_attributes) { create(:case_attributes, **traits) }
       let(:traits) { { case_id: c4s3.id, state: 'packaging' } }
       let(:state) { 'a state' }
-      let(:params) { nil }
+      let(:params) { {} }
 
       it 'should raise RuntimeError' do
         expect { subject }.to raise_error(RuntimeError)
@@ -176,7 +176,7 @@ RSpec.describe MFCCase do
       include MFCCase::EventProcessors::IssueProcessorSpecHelper
 
       let(:c4s3) { create_case(:issuance, rejecting_expected_at) }
-      let(:rejecting_expected_at) { Time.now + 24 * 60 * 60 }
+      let(:rejecting_expected_at) { (Time.now + 86_400).strftime('%F %T') }
       let(:params) { { operator_id: '123' } }
       let(:state) { 'closed' }
 
@@ -333,8 +333,8 @@ RSpec.describe MFCCase do
       let(:c4s3) { create_case('pending', *args) }
       let(:state) { 'processing' }
       let(:args) { [issue_location_type, added_to_rejecting_at] }
-      let(:issue_location_type) { 'institution' }
-      let(:added_to_rejecting_at) { '' }
+      let(:issue_location_type) { 'mfc' }
+      let(:added_to_rejecting_at) { nil }
       let(:params) { { operator_id: 'operator_id' } }
 
       it 'should set case state to `processing`' do
@@ -352,12 +352,18 @@ RSpec.describe MFCCase do
       end
 
       context 'when `issue_location_type` value is `institution`' do
-        context 'when `added_to_rejecting_at` value is present' do
-          let(:added_to_rejecting_at) { Time.now }
+        let(:issue_location_type) { 'institution' }
 
-          it 'should raise RuntimeError' do
-            expect { subject }.to raise_error(RuntimeError)
-          end
+        it 'should raise RuntimeError' do
+          expect { subject }.to raise_error(RuntimeError)
+        end
+      end
+
+      context 'when `added_to_rejecting_at` value is present' do
+        let(:added_to_rejecting_at) { Time.now.strftime('%F %T') }
+
+        it 'should raise RuntimeError' do
+          expect { subject }.to raise_error(RuntimeError)
         end
       end
     end

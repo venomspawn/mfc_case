@@ -49,7 +49,8 @@ module MFCCase
         #   отсутствует или его значение пусто
         #
         def case_docs_sent_at(c4s3)
-          case_attributes(c4s3.id)[:docs_sent_at]
+          value = case_attributes(c4s3.id)[:docs_sent_at]
+          value && Time.parse(value)
         end
 
         # Возвращает значение атрибута `processor_person_id` заявки

@@ -62,7 +62,8 @@ module MFCCase
       #   отсутствует или его значение пусто
       #
       def case_added_to_pending_at(c4s3)
-        case_attributes(c4s3.id).dig(:added_to_pending_at)
+        value = case_attributes(c4s3.id).dig(:added_to_pending_at)
+        value && Time.parse(value)
       end
     end
   end
