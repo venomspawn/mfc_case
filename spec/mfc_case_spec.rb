@@ -205,16 +205,16 @@ RSpec.describe MFCCase do
         let!(:attrs) { create(:case_attributes, **args) }
         let(:args) { { case_id: c4s3.id, state: 'issuance' } }
 
-        it 'should raise ArgumentError' do
-          expect { subject }.to raise_error(ArgumentError)
+        it 'should raise NoMethodError' do
+          expect { subject }.to raise_error(NoMethodError)
         end
       end
 
       context 'when `rejecting_expected_at` attribute is nil' do
         let(:rejecting_expected_at) { nil }
 
-        it 'should raise ArgumentError' do
-          expect { subject }.to raise_error(ArgumentError)
+        it 'should raise NoMethodError' do
+          expect { subject }.to raise_error(NoMethodError)
         end
       end
 
@@ -257,16 +257,16 @@ RSpec.describe MFCCase do
         let!(:attrs) { create(:case_attributes, **args) }
         let(:args) { { case_id: c4s3.id, state: 'issuance' } }
 
-        it 'should raise ArgumentError' do
-          expect { subject }.to raise_error(ArgumentError)
+        it 'should raise NoMethodError' do
+          expect { subject }.to raise_error(NoMethodError)
         end
       end
 
       context 'when `rejecting_expected_at` attribute is nil' do
         let(:rejecting_expected_at) { nil }
 
-        it 'should raise ArgumentError' do
-          expect { subject }.to raise_error(ArgumentError)
+        it 'should raise NoMethodError' do
+          expect { subject }.to raise_error(NoMethodError)
         end
       end
 
@@ -294,7 +294,7 @@ RSpec.describe MFCCase do
       let(:state) { 'closed' }
       let(:args) { [issue_location_type, added_to_rejecting_at] }
       let(:issue_location_type) { 'institution' }
-      let(:added_to_rejecting_at) { '' }
+      let(:added_to_rejecting_at) { nil }
       let(:params) { { operator_id: 'operator_id' } }
 
       it 'should set case state to `closed`' do
@@ -319,7 +319,7 @@ RSpec.describe MFCCase do
       context 'when `issue_location_type` value isn\'t `institution`' do
         let(:issue_location_type) { '' }
 
-        context 'when `added_to_rejecting_at` value isn\'t present' do
+        context 'when `added_to_rejecting_at` value is nil' do
           it 'should raise RuntimeError' do
             expect { subject }.to raise_error(RuntimeError)
           end

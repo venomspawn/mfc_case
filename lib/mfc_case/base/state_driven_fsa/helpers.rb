@@ -2,7 +2,7 @@
 
 module MFCCase
   module Base
-    class FSA
+    class StateDrivenFSA
       # @author Александр Ильчуков <a.s.ilchukov@cit.rkomi.ru>
       #
       # Вспомогательный модуль, предназначенный для включения в содержащий
@@ -91,7 +91,7 @@ module MFCCase
 
         # Регулярное выражение для извлечения типа модуля бизнес-логики
         #
-        TYPE_REGEXP = /lib\/([^\/].*)\/base\/fsa/
+        TYPE_REGEXP = /lib\/([^\/].*)\/base\/state_driven_fsa/
 
         # Извлекает тип модуля бизнес-логики из пути текущего файла
         #

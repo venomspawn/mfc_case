@@ -1,6 +1,7 @@
 # encoding: utf-8
 
 require 'active_support/core_ext/object/blank.rb'
+require 'active_support/core_ext/string/conversions.rb'
 require 'active_support/core_ext/string/filters.rb'
 
 load "#{__dir__}/mfc_case/change_state_to.rb"

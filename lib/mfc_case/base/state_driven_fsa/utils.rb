@@ -2,7 +2,7 @@
 
 module MFCCase
   module Base
-    class FSA
+    class StateDrivenFSA
       # @author Александр Ильчуков <a.s.ilchukov@cit.rkomi.ru>
       #
       # Модуль, предназначенный для включения в содержащий класс,

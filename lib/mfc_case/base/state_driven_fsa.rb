@@ -1,5 +1,7 @@
 # encoding: utf-8
 
+require 'ostruct'
+
 module MFCCase
   # @author Александр Ильчуков <a.s.ilchukov@cit.rkomi.ru>
   #
@@ -9,10 +11,12 @@ module MFCCase
   module Base
     # @author Александр Ильчуков <a.s.ilchukov@cit.rkomi.ru>
     #
-    # Базовый класс обработчиков события изменения состояния заявки
+    # Базовый класс обработчиков события изменения состояния заявки, основанный
+    # на графе переходов состояния заявки. Алфавитом входящих сигналов служат
+    # названия состояний, в которые переходят заявки.
     #
-    class FSA
-      Dir["#{__dir__}/fsa/*.rb"].each(&method(:load))
+    class StateDrivenFSA
+      Dir["#{__dir__}/state_driven_fsa/*.rb"].each(&method(:load))
 
       extend  Edges
       include Helpers
@@ -55,9 +59,13 @@ module MFCCase
       #
       # 1.  Проверяет, возможно ли перейти из текущего состояния заявки в новое
       #     состояние.
-      # 2.  Если с дугой ассоциирован параметр `check`, то вызывает метод
-      #     `call` объекта, являющегося значением параметра, c записью заявки и
-      #     ассоциативным массивом атрибутов заявки в качестве аргументов
+      # 2.  Если с дугой ассоциирован параметр `check`, то вызывает функцию,
+      #     являющегося значением параметра, без аргументов в контексте объекта
+      #     типа `OpenStruct`, который создаётся на основе ассоциативного
+      #     массива атрибутов заявки. Если функция возвращает булево значение
+      #     `false` и с дугой ассоциирован параметр `raise`, значение которого
+      #     является классом ошибок, то создаёт ошибку этого класса, передавая
+      #     в конструктор запись заявки.
       # 3.  Если с дугой ассоциирован параметр `set`, то обновляет атрибуты
       #     заявки согласно ассоциативному массиву, который является значением
       #     параметра. Каждый ключ ассоциативного массива интерпретируется в
@@ -71,20 +79,21 @@ module MFCCase
       #         параметров. Если это так, то в качестве значения атрибута
       #         берётся значение соответствующего параметра. Если нет, то в
       #         качестве значения атрибута берётся само исходное значение.
-      # 4.  Если с дугой ассоциирован параметр `after`, то вызывает метод
-      #     `call` объекта, являющегося значением параметра, с записью заявки и
-      #     ассоциативным массивом атрибутов заявки в качестве аргументов.
       #
       # @raise [RuntimeError]
       #   если выставление статуса невозможно для данного статуса заявки
+      #
+      # @raise [RuntimeError]
+      #   если функция, являющаяся значением параметра `check`, вернула булево
+      #   значение `false` и с дугой ассоциирован параметр `raise`, являющийся
+      #   классом ошибок
       #
       def process
         edge = [case_attributes[:state], state]
         check_edge!(c4s3, edge, edges)
         edge_info = edges[edge]
-        edge_info.check&.call(c4s3, case_attributes)
-        update_case_attributes(edge_info.set)
-        edge_info.after&.call(c4s3, case_attributes)
+        invoke_check(edge_info)
+        update_case_attributes(edge_info)
       end
 
       private
@@ -140,28 +149,41 @@ module MFCCase
         attrs.uniq
       end
 
-      # Обновляет атрибуты заявки согласно информации об их значениях
+      # Вызывает функцию, являющуюся значением параметра `check`, без
+      # аргументов в контексте объекта типа `OpenStruct`, который создаётся на
+      # основе ассоциативного массива атрибутов заявки. Если функция возвращает
+      # булево значение `false` и с дугой ассоциирован параметр `raise`,
+      # значение которого является классом ошибок, то создаёт ошибку этого
+      # класса, передавая в конструктор запись заявки.
       #
-      # @param [NilClass, Hash] info
-      #   ассоциативный массив с информацией о значениях атрибутов или `nil`,
-      #   если такая информация отсутствует
+      # @param [EdgeInfo] edge_info
+      #   объект с информацией о переходе по дуге графа переходов состояний
+      #   состояния заявки
       #
-      def update_case_attributes(info)
-        attributes = new_case_attributes(info)
-        CaseCore::Actions::Cases.update(id: c4s3.id, **attributes)
+      # @raise [RuntimeError]
+      #   если функция, являющаяся значением параметра `check`, вернула булево
+      #   значение `false` и с дугой ассоциирован параметр `raise`, являющийся
+      #   классом ошибок
+      #
+      def invoke_check(edge_info)
+        return unless edge_info.check.is_a?(Proc)
+        result = check_context.instance_exec(&edge_info.check)
+        return unless result.is_a?(FalseClass)
+        return unless edge_info.raise < RuntimeError
+        raise edge_info.raise.new(c4s3)
       end
 
-      # Возвращает ассоциативный массив, в котором названиям атрибутов заявки
-      # соответствуют их новые значения
+      # Обновляет атрибуты заявки согласно информации об их значениях
       #
-      # @param [NilClass, Hash] info
-      #   ассоциативный массив с информацией о значениях атрибутов или `nil`,
-      #   если такая информация отсутствует
+      # @param [EdgeInfo] edge_info
+      #   объект с информацией о переходе по дуге графа переходов состояний
+      #   состояния заявки
       #
-      def new_case_attributes(info)
-        info ||= {}
-        values = info.each_value.map(&method(:obtain_value))
-        Hash[info.keys.zip(values)].update(state: state)
+      def update_case_attributes(edge_info)
+        set = edge_info.set || {}
+        values = set.each_value.map(&method(:obtain_value))
+        attrs = Hash[set.keys.zip(values)]
+        CaseCore::Actions::Cases.update(id: c4s3.id, state: state, **attrs)
       end
 
       # Возвращает значение согласно следующим проверкам.
@@ -189,6 +211,16 @@ module MFCCase
         else
           value_info
         end
+      end
+
+      # Возвращает объект, в контексте которого происходит проверка условий,
+      # заданного параметром `check`
+      #
+      # @return [Object]
+      #   результирующий объект
+      #
+      def check_context
+        OpenStruct.new(case_attributes)
       end
     end
   end
