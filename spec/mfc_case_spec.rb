@@ -71,7 +71,7 @@ RSpec.describe MFCCase do
     end
 
     context 'when case state is switching from `packaging` to `pending`' do
-      include MFCCase::EventProcessors::AddToPendingListProcessorSpecHelper
+      include MFCCase::ChangeStateTo::PackagingPendingSpecHelper
 
       let(:c4s3) { create_case('packaging') }
       let(:params) { { office_id: office_id } }
@@ -89,7 +89,7 @@ RSpec.describe MFCCase do
     end
 
     context 'when case state is switching from `rejecting` to `pending`' do
-      include MFCCase::EventProcessors::AddToPendingListProcessorSpecHelper
+      include MFCCase::ChangeStateTo::RejectingPendingSpecHelper
 
       let(:c4s3) { create_case('rejecting') }
       let(:params) { { office_id: office_id } }
@@ -107,8 +107,7 @@ RSpec.describe MFCCase do
     end
 
     context 'when case state is switching from `pending` to `packaging`' do
-      event_processors = MFCCase::EventProcessors
-      include event_processors::RemoveFromPendingListProcessorSpecHelper
+      include MFCCase::ChangeStateTo::PendingPackagingSpecHelper
 
       let(:c4s3) { create_case(:pending, nil) }
       let(:added_to_rejecting_at) { nil }
@@ -126,8 +125,7 @@ RSpec.describe MFCCase do
     end
 
     context 'when case state is switching from `pending` to `rejecting`' do
-      event_processors = MFCCase::EventProcessors
-      include event_processors::RemoveFromPendingListProcessorSpecHelper
+      include MFCCase::ChangeStateTo::PendingRejectingSpecHelper
 
       let(:c4s3) { create_case(:pending, Time.now) }
       let(:added_to_rejecting_at) { nil }
@@ -145,7 +143,7 @@ RSpec.describe MFCCase do
     end
 
     context 'when case state is switching from `processing` to `issuance`' do
-      include MFCCase::EventProcessors::SendToFrontOfficeProcessorSpecHelper
+      include MFCCase::ChangeStateTo::ProcessingIssuanceSpecHelper
 
       let(:c4s3) { create_case(:processing) }
       let(:params) { { operator_id: 'operator_id', result_id: 'result_id' } }
@@ -173,7 +171,7 @@ RSpec.describe MFCCase do
     end
 
     context 'when case state is switching from `issuance` to `closed`' do
-      include MFCCase::EventProcessors::IssueProcessorSpecHelper
+      include MFCCase::ChangeStateTo::IssuanceClosedSpecHelper
 
       let(:c4s3) { create_case(:issuance, rejecting_expected_at) }
       let(:rejecting_expected_at) { (Time.now + 86_400).strftime('%F %T') }
@@ -236,7 +234,7 @@ RSpec.describe MFCCase do
     end
 
     context 'when case state is switching from `issuance` to `rejecting`' do
-      include MFCCase::EventProcessors::RejectResultProcessorSpecHelper
+      include MFCCase::ChangeStateTo::IssuanceRejectingSpecHelper
 
       let(:c4s3) { create_case(:issuance, rejecting_expected_at) }
       let(:rejecting_expected_at) { Time.now - 24 * 60 * 60 }
@@ -288,7 +286,7 @@ RSpec.describe MFCCase do
     end
 
     context 'when case state is switching from `pending` to `closed`' do
-      include MFCCase::EventProcessors::ExportAndCloseProcessor::SpecHelper
+      include MFCCase::ChangeStateTo::PendingClosedSpecHelper
 
       let(:c4s3) { create_case('pending', *args) }
       let(:state) { 'closed' }
@@ -328,7 +326,7 @@ RSpec.describe MFCCase do
     end
 
     context 'when case state is switching from `pending` to `processing`' do
-      include MFCCase::EventProcessors::ExportToProcessProcessor::SpecHelper
+      include MFCCase::ChangeStateTo::PendingProcessingSpecHelper
 
       let(:c4s3) { create_case('pending', *args) }
       let(:state) { 'processing' }
@@ -370,7 +368,7 @@ RSpec.describe MFCCase do
   end
 
   describe '.on_case_creation' do
-    include MFCCase::EventProcessors::CaseCreationProcessorSpecHelper
+    include MFCCase::ChangeStateTo::NilPackagingSpecHelper
 
     subject { described_class.on_case_creation(c4s3) }
 
