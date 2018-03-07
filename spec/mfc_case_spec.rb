@@ -19,7 +19,7 @@ RSpec.describe MFCCase do
     context 'when `case` argument is not of `CaseCore::Models::Case` type' do
       let(:c4s3) { 'not of `CaseCore::Models::Case` type' }
       let(:state) { 'pending' }
-      let(:params) { nil }
+      let(:params) { {} }
 
       it 'should raise ArgumentError' do
         expect { subject }.to raise_error(ArgumentError)
@@ -29,7 +29,7 @@ RSpec.describe MFCCase do
     context 'when case type is wrong' do
       let(:c4s3) { create(:case, type: :wrong) }
       let(:state) { 'pending' }
-      let(:params) { nil }
+      let(:params) { {} }
 
       it 'should raise RuntimeError' do
         expect { subject }.to raise_error(RuntimeError)
@@ -39,7 +39,7 @@ RSpec.describe MFCCase do
     context 'when case state is absent' do
       let(:c4s3) { create(:case, type: 'mfc_case') }
       let(:state) { 'pending' }
-      let(:params) { nil }
+      let(:params) { {} }
 
       it 'should raise RuntimeError' do
         expect { subject }.to raise_error(RuntimeError)
@@ -63,7 +63,7 @@ RSpec.describe MFCCase do
       let!(:case_attributes) { create(:case_attributes, **traits) }
       let(:traits) { { case_id: c4s3.id, state: 'packaging' } }
       let(:state) { 'a state' }
-      let(:params) { nil }
+      let(:params) { {} }
 
       it 'should raise RuntimeError' do
         expect { subject }.to raise_error(RuntimeError)
@@ -71,7 +71,7 @@ RSpec.describe MFCCase do
     end
 
     context 'when case state is switching from `packaging` to `pending`' do
-      include MFCCase::EventProcessors::AddToPendingListProcessorSpecHelper
+      include MFCCase::ChangeStateTo::PackagingPendingSpecHelper
 
       let(:c4s3) { create_case('packaging') }
       let(:params) { { office_id: office_id } }
@@ -89,7 +89,7 @@ RSpec.describe MFCCase do
     end
 
     context 'when case state is switching from `rejecting` to `pending`' do
-      include MFCCase::EventProcessors::AddToPendingListProcessorSpecHelper
+      include MFCCase::ChangeStateTo::RejectingPendingSpecHelper
 
       let(:c4s3) { create_case('rejecting') }
       let(:params) { { office_id: office_id } }
@@ -107,8 +107,7 @@ RSpec.describe MFCCase do
     end
 
     context 'when case state is switching from `pending` to `packaging`' do
-      event_processors = MFCCase::EventProcessors
-      include event_processors::RemoveFromPendingListProcessorSpecHelper
+      include MFCCase::ChangeStateTo::PendingPackagingSpecHelper
 
       let(:c4s3) { create_case(:pending, nil) }
       let(:added_to_rejecting_at) { nil }
@@ -126,8 +125,7 @@ RSpec.describe MFCCase do
     end
 
     context 'when case state is switching from `pending` to `rejecting`' do
-      event_processors = MFCCase::EventProcessors
-      include event_processors::RemoveFromPendingListProcessorSpecHelper
+      include MFCCase::ChangeStateTo::PendingRejectingSpecHelper
 
       let(:c4s3) { create_case(:pending, Time.now) }
       let(:added_to_rejecting_at) { nil }
@@ -145,7 +143,7 @@ RSpec.describe MFCCase do
     end
 
     context 'when case state is switching from `processing` to `issuance`' do
-      include MFCCase::EventProcessors::SendToFrontOfficeProcessorSpecHelper
+      include MFCCase::ChangeStateTo::ProcessingIssuanceSpecHelper
 
       let(:c4s3) { create_case(:processing) }
       let(:params) { { operator_id: 'operator_id', result_id: 'result_id' } }
@@ -173,10 +171,10 @@ RSpec.describe MFCCase do
     end
 
     context 'when case state is switching from `issuance` to `closed`' do
-      include MFCCase::EventProcessors::IssueProcessorSpecHelper
+      include MFCCase::ChangeStateTo::IssuanceClosedSpecHelper
 
       let(:c4s3) { create_case(:issuance, rejecting_expected_at) }
-      let(:rejecting_expected_at) { Time.now + 24 * 60 * 60 }
+      let(:rejecting_expected_at) { (Time.now + 86_400).strftime('%F %T') }
       let(:params) { { operator_id: '123' } }
       let(:state) { 'closed' }
 
@@ -205,16 +203,16 @@ RSpec.describe MFCCase do
         let!(:attrs) { create(:case_attributes, **args) }
         let(:args) { { case_id: c4s3.id, state: 'issuance' } }
 
-        it 'should raise ArgumentError' do
-          expect { subject }.to raise_error(ArgumentError)
+        it 'should raise NoMethodError' do
+          expect { subject }.to raise_error(NoMethodError)
         end
       end
 
       context 'when `rejecting_expected_at` attribute is nil' do
         let(:rejecting_expected_at) { nil }
 
-        it 'should raise ArgumentError' do
-          expect { subject }.to raise_error(ArgumentError)
+        it 'should raise NoMethodError' do
+          expect { subject }.to raise_error(NoMethodError)
         end
       end
 
@@ -236,7 +234,7 @@ RSpec.describe MFCCase do
     end
 
     context 'when case state is switching from `issuance` to `rejecting`' do
-      include MFCCase::EventProcessors::RejectResultProcessorSpecHelper
+      include MFCCase::ChangeStateTo::IssuanceRejectingSpecHelper
 
       let(:c4s3) { create_case(:issuance, rejecting_expected_at) }
       let(:rejecting_expected_at) { Time.now - 24 * 60 * 60 }
@@ -257,16 +255,16 @@ RSpec.describe MFCCase do
         let!(:attrs) { create(:case_attributes, **args) }
         let(:args) { { case_id: c4s3.id, state: 'issuance' } }
 
-        it 'should raise ArgumentError' do
-          expect { subject }.to raise_error(ArgumentError)
+        it 'should raise NoMethodError' do
+          expect { subject }.to raise_error(NoMethodError)
         end
       end
 
       context 'when `rejecting_expected_at` attribute is nil' do
         let(:rejecting_expected_at) { nil }
 
-        it 'should raise ArgumentError' do
-          expect { subject }.to raise_error(ArgumentError)
+        it 'should raise NoMethodError' do
+          expect { subject }.to raise_error(NoMethodError)
         end
       end
 
@@ -288,13 +286,13 @@ RSpec.describe MFCCase do
     end
 
     context 'when case state is switching from `pending` to `closed`' do
-      include MFCCase::EventProcessors::ExportAndCloseProcessor::SpecHelper
+      include MFCCase::ChangeStateTo::PendingClosedSpecHelper
 
       let(:c4s3) { create_case('pending', *args) }
       let(:state) { 'closed' }
       let(:args) { [issue_location_type, added_to_rejecting_at] }
       let(:issue_location_type) { 'institution' }
-      let(:added_to_rejecting_at) { '' }
+      let(:added_to_rejecting_at) { nil }
       let(:params) { { operator_id: 'operator_id' } }
 
       it 'should set case state to `closed`' do
@@ -319,7 +317,7 @@ RSpec.describe MFCCase do
       context 'when `issue_location_type` value isn\'t `institution`' do
         let(:issue_location_type) { '' }
 
-        context 'when `added_to_rejecting_at` value isn\'t present' do
+        context 'when `added_to_rejecting_at` value is nil' do
           it 'should raise RuntimeError' do
             expect { subject }.to raise_error(RuntimeError)
           end
@@ -328,13 +326,13 @@ RSpec.describe MFCCase do
     end
 
     context 'when case state is switching from `pending` to `processing`' do
-      include MFCCase::EventProcessors::ExportToProcessProcessor::SpecHelper
+      include MFCCase::ChangeStateTo::PendingProcessingSpecHelper
 
       let(:c4s3) { create_case('pending', *args) }
       let(:state) { 'processing' }
       let(:args) { [issue_location_type, added_to_rejecting_at] }
-      let(:issue_location_type) { 'institution' }
-      let(:added_to_rejecting_at) { '' }
+      let(:issue_location_type) { 'mfc' }
+      let(:added_to_rejecting_at) { nil }
       let(:params) { { operator_id: 'operator_id' } }
 
       it 'should set case state to `processing`' do
@@ -352,19 +350,25 @@ RSpec.describe MFCCase do
       end
 
       context 'when `issue_location_type` value is `institution`' do
-        context 'when `added_to_rejecting_at` value is present' do
-          let(:added_to_rejecting_at) { Time.now }
+        let(:issue_location_type) { 'institution' }
 
-          it 'should raise RuntimeError' do
-            expect { subject }.to raise_error(RuntimeError)
-          end
+        it 'should raise RuntimeError' do
+          expect { subject }.to raise_error(RuntimeError)
+        end
+      end
+
+      context 'when `added_to_rejecting_at` value is present' do
+        let(:added_to_rejecting_at) { Time.now.strftime('%F %T') }
+
+        it 'should raise RuntimeError' do
+          expect { subject }.to raise_error(RuntimeError)
         end
       end
     end
   end
 
   describe '.on_case_creation' do
-    include MFCCase::EventProcessors::CaseCreationProcessorSpecHelper
+    include MFCCase::ChangeStateTo::NilPackagingSpecHelper
 
     subject { described_class.on_case_creation(c4s3) }
 

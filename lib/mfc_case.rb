@@ -1,9 +1,10 @@
 # encoding: utf-8
 
 require 'active_support/core_ext/object/blank.rb'
+require 'active_support/core_ext/string/conversions.rb'
 require 'active_support/core_ext/string/filters.rb'
 
-load "#{__dir__}/mfc_case/event_processors.rb"
+load "#{__dir__}/mfc_case/change_state_to.rb"
 load "#{__dir__}/mfc_case/version.rb"
 
 # @author Александр Ильчуков <a.s.ilchukov@cit.rkomi.ru>
@@ -22,12 +23,8 @@ module MFCCase
   # @raise [RuntimeError]
   #   если значение поля `type` записи заявки не равно `mfc_case`
   #
-  # @raise [RuntimeError]
-  #   если заявка обладает выставленным статусом
-  #
   def self.on_case_creation(c4s3)
-    processor = EventProcessors::CaseCreationProcessor.new(c4s3)
-    processor.process
+    ChangeStateTo.new(c4s3, 'packaging', {}).process
   end
 
   # Выставляет статус заявки
@@ -38,18 +35,17 @@ module MFCCase
   # @param [Object] state
   #   выставляемый статус заявки
   #
-  # @param [NilClass, Hash] params
-  #   ассоциативный массив параметров или `nil`
+  # @param [Hash] params
+  #   ассоциативный массив параметров
   #
   # @raise [ArgumentError]
   #   если аргумент `c4s3` не является объектом класса `CaseCore::Models::Case`
   #
   # @raise [ArgumentError]
-  #   если аргумент `params` не является ни объектом класса `NilClass`, ни
-  #   объектом класса `Hash`
+  #   если аргумент `params` не является объектом класса `Hash`
   #
   # @raise [ArgumentError]
-  #   если заявка переходит из статуса `processing` в статус `issuance`, но
+  #   если заявка переходит из статуса `issuance` в статус `closed`, но
   #   значение атрибута `rejecting_expected_at` не может быть интерпретировано
   #   в качестве даты
   #
@@ -65,12 +61,7 @@ module MFCCase
   #   если выставление статуса невозможно для данного статуса заявки
   #
   # @raise [RuntimeError]
-  #   если заявка переходит из статуса `pending` в статус `packaging` или
-  #   `rejecting`, но запись заявки не прикреплена к записи реестра
-  #   передаваемой корреспонденции
-  #
-  # @raise [RuntimeError]
-  #   если заявка переходит из статуса `processing` в статус `issuance`, но
+  #   если заявка переходит из статуса `issuance` в статус `closed`, но
   #   текущая дата больше значения, записанного в атрибуте
   #   `rejecting_expected_at`
   #
@@ -92,8 +83,6 @@ module MFCCase
   #   значение пусто
   #
   def self.change_state_to(c4s3, state, params)
-    processor =
-      EventProcessors::ChangeStateToProcessor.new(c4s3, state, params)
-    processor.process
+    ChangeStateTo.new(c4s3, state, params).process
   end
 end

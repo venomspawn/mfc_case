@@ -32,8 +32,9 @@ module CaseCore
       #   результирующий ассоциативный массив
       #
       def self.show_attributes(params)
-        case_id = params[:id]
-        attrs = Models::CaseAttribute.where(case_id: case_id)
+        args = { case_id: params[:id] }
+        args[:name] = params[:names] unless params[:names].nil?
+        attrs = Models::CaseAttribute.where(args)
         attrs.each_with_object({}) do |attr, memo|
           memo[attr.name.to_s.to_sym] = attr.value
         end
