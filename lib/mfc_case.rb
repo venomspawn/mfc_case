@@ -3,8 +3,10 @@
 require 'active_support/core_ext/object/blank.rb'
 require 'active_support/core_ext/string/conversions.rb'
 require 'active_support/core_ext/string/filters.rb'
+require 'rufus-scheduler'
 
 load "#{__dir__}/mfc_case/change_state_to.rb"
+load "#{__dir__}/mfc_case/rejector.rb"
 load "#{__dir__}/mfc_case/version.rb"
 
 # @author Александр Ильчуков <a.s.ilchukov@cit.rkomi.ru>
@@ -12,6 +14,22 @@ load "#{__dir__}/mfc_case/version.rb"
 # Модуль, реализующий бизнес-логику неавтоматизированной услуги
 #
 module MFCCase
+  # Загружает автоматическое выставление статуса заявок, срок выдачи результата
+  # которых истёк
+  #
+  def self.on_load
+    on_unload
+    @scheduler = Rufus::Scheduler.new
+    @scheduler.cron('0 0 * * *', &Rejector.method(:reject))
+  end
+
+  # Выгружает автоматическое выставление статуса заявок
+  #
+  def self.on_unload
+    @scheduler&.stop
+    @scheduler = nil
+  end
+
   # Выставляет начальный статус заявки `packaging`
   #
   # @param [CaseCore::Models::Case] c4s3
