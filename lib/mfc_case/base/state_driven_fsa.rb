@@ -143,7 +143,8 @@ module MFCCase
       #   результирующий список
       #
       def all_needed_attrs
-        attrs = edges.each_value.each_with_object([]) do |edge_info, memo|
+        infos = edges.each_value
+        attrs = infos.each_with_object(%w(state)) do |edge_info, memo|
           memo.concat(edge_info.need) unless edge_info.need.nil?
         end
         attrs.uniq
