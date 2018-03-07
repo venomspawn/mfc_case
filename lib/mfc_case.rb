@@ -5,6 +5,7 @@ require 'active_support/core_ext/string/conversions.rb'
 require 'active_support/core_ext/string/filters.rb'
 
 load "#{__dir__}/mfc_case/change_state_to.rb"
+load "#{__dir__}/mfc_case/rejector.rb"
 load "#{__dir__}/mfc_case/version.rb"
 
 # @author Александр Ильчуков <a.s.ilchukov@cit.rkomi.ru>
