@@ -10,7 +10,8 @@ RSpec.describe MFCCase do
   describe 'the module' do
     subject { described_class }
 
-    it { is_expected.to respond_to(:change_state_to, :on_case_creation) }
+    methods = %i(change_state_to on_case_creation on_load on_unload)
+    it { is_expected.to respond_to(*methods) }
   end
 
   describe '.change_state_to' do
@@ -401,6 +402,75 @@ RSpec.describe MFCCase do
 
       it 'should raise RuntimeError' do
         expect { subject }.to raise_error(RuntimeError)
+      end
+    end
+  end
+
+  describe '.on_load' do
+    subject { described_class.on_load }
+
+    it 'should create Rufus::Scheduler instance and save it' do
+      subject
+      expect(described_class.instance_variable_get('@scheduler'))
+        .to be_a(Rufus::Scheduler)
+    end
+
+    context 'when there already is an instance of Rufus::Scheduler running' do
+      before do
+        scheduler = Rufus::Scheduler.new
+        described_class.instance_variable_set('@scheduler', scheduler)
+      end
+
+      it 'should create new instance' do
+        expect { subject }
+          .to change { described_class.instance_variable_get('@scheduler') }
+      end
+    end
+
+    describe 'started Rufus::Scheduler instance' do
+      subject(:sched) do
+        described_class.on_load
+        described_class.instance_variable_get('@scheduler')
+      end
+
+      it 'should have just one cron job' do
+        expect(subject.jobs.size).to be == 1
+        expect(subject.jobs.first).to be_a(Rufus::Scheduler::CronJob)
+      end
+
+      describe 'the cron job' do
+        subject { sched.jobs.first }
+
+        it 'should run every day' do
+          expect(subject.frequency).to be == 86_400
+        end
+
+        it 'should start tomorrow' do
+          expect(subject.next_time.strftime('%F'))
+            .to be == Date.today.succ.to_s
+        end
+      end
+    end
+  end
+
+  describe '.on_unload' do
+    subject { described_class.on_unload }
+
+    it 'should stop saved Rufus::Scheduler instance' do
+      described_class.on_load
+      scheduler = described_class.instance_variable_get('@scheduler')
+      subject
+      expect(scheduler.down?).to be_truthy
+    end
+
+    it 'should clear saved Rufus::Scheduler instance' do
+      subject
+      expect(described_class.instance_variable_get('@scheduler')).to be_nil
+    end
+
+    context 'when there is no instance' do
+      it 'should be a\'ight' do
+        expect { subject }.not_to raise_error
       end
     end
   end
