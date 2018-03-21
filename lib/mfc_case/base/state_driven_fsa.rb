@@ -1,20 +1,14 @@
-# encoding: utf-8
+# frozen_string_literal: true
 
 require 'ostruct'
 
 module MFCCase
-  # @author Александр Ильчуков <a.s.ilchukov@cit.rkomi.ru>
-  #
   # Пространство имён для базового класса обработчиков события изменения
   # состояния заявки
-  #
   module Base
-    # @author Александр Ильчуков <a.s.ilchukov@cit.rkomi.ru>
-    #
     # Базовый класс обработчиков события изменения состояния заявки, основанный
     # на графе переходов состояния заявки. Алфавитом входящих сигналов служат
     # названия состояний, в которые переходят заявки.
-    #
     class StateDrivenFSA
       Dir["#{__dir__}/state_driven_fsa/*.rb"].each(&method(:load))
 
@@ -23,27 +17,20 @@ module MFCCase
       include Utils
 
       # Инициализирует объект класса
-      #
       # @param [CaseCore::Models::Case] c4s3
       #   запись заявки
-      #
       # @param [Object] state
       #   выставляемый статус заявки
-      #
       # @param [Hash] params
       #   ассоциативный массив параметров
-      #
       # @raise [ArgumentError]
       #   если аргумент `c4s3` не является объектом класса
       #   `CaseCore::Models::Case`
-      #
       # @raise [ArgumentError]
       #   если аргумент `params` не является объектом класса `Hash`
-      #
       # @raise [RuntimeError]
       #   если значение поля `type` записи заявки указывает на иной модуль
       #   бизнес-логики, нежели корневой модуль
-      #
       def initialize(c4s3, state, params)
         check_case!(c4s3)
         check_case_type!(c4s3, type)
@@ -56,7 +43,6 @@ module MFCCase
 
       # Осуществляет следующие действия согласно информации, ассоциированной с
       # дугой графа переходов состояния заявки.
-      #
       # 1.  Проверяет, возможно ли перейти из текущего состояния заявки в новое
       #     состояние.
       # 2.  Если с дугой ассоциирован параметр `check`, то вызывает функцию,
@@ -79,15 +65,12 @@ module MFCCase
       #         параметров. Если это так, то в качестве значения атрибута
       #         берётся значение соответствующего параметра. Если нет, то в
       #         качестве значения атрибута берётся само исходное значение.
-      #
       # @raise [RuntimeError]
       #   если выставление статуса невозможно для данного статуса заявки
-      #
       # @raise [RuntimeError]
       #   если функция, являющаяся значением параметра `check`, вернула булево
       #   значение `false` и с дугой ассоциирован параметр `raise`, являющийся
       #   классом ошибок
-      #
       def process
         edge = [case_attributes[:state], state]
         check_edge!(c4s3, edge, edges)
@@ -99,52 +82,40 @@ module MFCCase
       private
 
       # Запись заявки
-      #
       # @return [CaseCore::Models::Case]
       #   запись заявки
-      #
       attr_reader :c4s3
 
       # Выставляемый статус заявки
-      #
       # @return [String]
       #   выставляемый статус заявки
-      #
       attr_reader :state
 
       # Ассоциативный массив параметров обработчика события
-      #
       # @return [Hash]
       #   ассоциативный массив параметров обработчика события
-      #
       attr_reader :params
 
       # Ассоциативный массив атрибутов заявки
-      #
       # @return [Hash]
       #   ассоциативный массив атрибутов заявки
-      #
       attr_reader :case_attributes
 
       # Возвращает ассоциативный массив с информацией о графе переходов
       # состояния заявки, созданного с помощью Edges класса
-      #
       # @return [Hash{Array<(String, String)> => Edges::EdgeInfo}]
       #   результирующий ассоциативный массив
-      #
       def edges
         self.class.edges
       end
 
       # Возвращает список названий всех атрибутов, извлекаемых при переходах
       # графа состояний заявки
-      #
       # @return [Array<String>]
       #   результирующий список
-      #
       def all_needed_attrs
         infos = edges.each_value
-        attrs = infos.each_with_object(%w(state)) do |edge_info, memo|
+        attrs = infos.each_with_object(%w[state]) do |edge_info, memo|
           memo.concat(edge_info.need) unless edge_info.need.nil?
         end
         attrs.uniq
@@ -156,16 +127,13 @@ module MFCCase
       # булево значение `false` и с дугой ассоциирован параметр `raise`,
       # значение которого является классом ошибок, то создаёт ошибку этого
       # класса, передавая в конструктор запись заявки.
-      #
       # @param [EdgeInfo] edge_info
       #   объект с информацией о переходе по дуге графа переходов состояний
       #   состояния заявки
-      #
       # @raise [RuntimeError]
       #   если функция, являющаяся значением параметра `check`, вернула булево
       #   значение `false` и с дугой ассоциирован параметр `raise`, являющийся
       #   классом ошибок
-      #
       def invoke_check(edge_info)
         return unless edge_info.check.is_a?(Proc)
         result = check_context.instance_exec(&edge_info.check)
@@ -175,51 +143,71 @@ module MFCCase
       end
 
       # Обновляет атрибуты заявки согласно информации об их значениях
-      #
       # @param [EdgeInfo] edge_info
       #   объект с информацией о переходе по дуге графа переходов состояний
       #   состояния заявки
-      #
       def update_case_attributes(edge_info)
-        set = edge_info.set || {}
-        values = set.each_value.map(&method(:obtain_value))
-        attrs = Hash[set.keys.zip(values)]
+        attrs = new_case_attributes(edge_info)
         CaseCore::Actions::Cases.update(id: c4s3.id, state: state, **attrs)
       end
 
-      # Возвращает значение согласно следующим проверкам.
-      #
-      # *   Если аргумент является названием метода экземпляра класса, то
-      #     возвращает результат вызова метода без аргументов.
-      # *   Если аргумент не является названием метода экземпляра класса, то
-      #     проверяется, является ли он ключом ассоциативного массива `params`.
-      #     Если это так, то возвращается значение по этому ключу, иначе
-      #     возвращается аргумент.
-      #
+      # Составляет ассоциативный массив новых атрибутов заявки и возвращает его
+      # @param [EdgeInfo] edge_info
+      #   объект с информацией о переходе по дуге графа переходов состояний
+      #   состояния заявки
+      # @return [Hash]
+      #   результирующий ассоциативный массив
+      def new_case_attributes(edge_info)
+        set = edge_info.set || {}
+        set.each_with_object({}) do |(key, value_info), memo|
+          value, skip = obtain_value(value_info)
+          memo[key] = value unless skip
+        end
+      end
+
+      # Возвращает список из двух элементов: извлечённого по аргументу значения
+      # и булева флага, сигнализирующего о том, надо ли пропустить это значение
+      # в ассоциативном массиве атрибутов
       # @param [Object] value_info
       #   аргумент
-      #
-      # @return [Object]
-      #   результирующее значение
-      #
+      # @return [Array<(Object, Boolean)>]
+      #   список из двух элементов: извлечённого по аргументу значения и булева
+      #   флага, сигнализирующего о том, надо ли пропустить это значение в
+      #   ассоциативном массиве атрибутов
       def obtain_value(value_info)
-        return value_info unless value_info.is_a?(String) ||
-                                 value_info.is_a?(Symbol)
+        case value_info
+        when String then extract_value(value_info, false)
+        when Symbol then extract_value(value_info, true)
+        else [value_info, false]
+        end
+      end
+
+      # Возвращает список из двух элементов: извлечённого по аргументу
+      # `value_info` значения и булева флага, сигнализирующего о том, надо ли
+      # пропустить это значение в ассоциативном массиве атрибутов
+      # @param [String, Symbol] value_info
+      #   название метода экземпляра класса или ключа параметров
+      # @param [Boolean] skip
+      #   надо ли пропустить значение, если значение `value_info` не является
+      #   названием ни метода экземпляра класса, ни ключа параметров
+      # @return [Array<(Object, Boolean)>]
+      #   список из двух элементов: извлечённого по аргументу `value_info`
+      #   значения и булева флага, сигнализирующего о том, надо ли пропустить
+      #   это значение в ассоциативном массиве атрибутов
+      def extract_value(value_info, skip)
         if respond_to?(value_info, true)
-          send(value_info)
-        elsif params.key?(value_info)
-          params[value_info]
+          [send(value_info), false]
+        elsif params.key?(value_info.to_sym)
+          [params[value_info.to_sym], false]
         else
-          value_info
+          [value_info, skip]
         end
       end
 
       # Возвращает объект, в контексте которого происходит проверка условий,
       # заданного параметром `check`
-      #
       # @return [Object]
       #   результирующий объект
-      #
       def check_context
         OpenStruct.new(case_attributes)
       end

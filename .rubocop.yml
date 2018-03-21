@@ -1,0 +1,44 @@
+---
+AllCops:
+  TargetRubyVersion: 2.4
+  Exclude:
+    - cm/**/*
+    - tmp/**/*
+    - spec/fixtures/**/*
+
+Lint/AmbiguousBlockAssociation:
+  Exclude:
+    - spec/**/*_spec.rb
+
+Metrics/AbcSize:
+  Max: 18
+
+Metrics/BlockLength:
+  Exclude:
+    - db/migrations/*
+    - spec/**/*_spec.rb
+    - spec/factories/**/*
+    - Rakefile
+    - Vagrantfile
+
+Naming/UncommunicativeMethodParamName:
+  AllowedNames:
+    - db
+    - to
+
+Style/AsciiComments:
+  Enabled: false
+
+Style/Documentation:
+  Enabled: false
+
+Style/GlobalVars:
+  AllowedVariables:
+    - $app_name
+    - $environment
+    - $lib
+    - $logger
+    - $root
+
+Style/RaiseArgs:
+  Enabled: false
