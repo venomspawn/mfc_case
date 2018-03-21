@@ -62,7 +62,7 @@ module MFCCase
 
     # B2
     edge pending: :packaging,
-         need:    :rejecting_sending_date,
+         need:    :rejecting_date,
          check:   -> { !rejected? },
          raise:   Errors::PendingPackaging,
          set: {
@@ -92,7 +92,7 @@ module MFCCase
 
     # B3
     edge pending: :processing,
-         need:    %w(issue_method rejecting_sending_date),
+         need:    %w(issue_method rejecting_date),
          check:   -> { !issuance_in_institution? && !rejected? },
          raise:   Errors::PendingProcessing,
          set: {
@@ -122,7 +122,7 @@ module MFCCase
 
     # B4
     edge pending: :rejecting,
-         need:    :rejecting_sending_date,
+         need:    :rejecting_date,
          check:   -> { rejected? },
          raise:   Errors::PendingRejecting,
          set: {
@@ -179,7 +179,7 @@ module MFCCase
 
     # B6
     edge pending: :closed,
-         need:    %w(issue_method rejecting_sending_date),
+         need:    %w(issue_method rejecting_date),
          check:   -> { issuance_in_institution? || rejected? },
          raise:   Errors::PendingClosed,
          set: {
@@ -209,7 +209,7 @@ module MFCCase
     edge processing: :issuance,
          set: {
            case_status: CASE_STATUS[:issuance],
-           issuance_receiving_date: :now
+           issuance_receiving_date: :now,
            **from_params_with_the_same_names(
              :issuance_office_mfc_building,
              :issuance_office_mfc_city,
@@ -238,7 +238,7 @@ module MFCCase
          raise:    Errors::IssuanceRejecting,
          set: {
            case_status: CASE_STATUS[:rejecting],
-           rejecting_sending_date: :now,
+           rejecting_date: :now,
          }
 
     # B9
@@ -288,14 +288,14 @@ module MFCCase
         issue_method == 'institution'
       end
 
-      # Возвращает, присутствует ли атрибут `rejecting_sending_date` с непустым
+      # Возвращает, присутствует ли атрибут `rejecting_date` с непустым
       # значением
       #
       # @return [Boolean]
-      #   присутствует ли атрибут `rejecting_sending_date` с непустым значением
+      #   присутствует ли атрибут `rejecting_date` с непустым значением
       #
       def rejected?
-        !rejecting_sending_date.nil?
+        !rejecting_date.nil?
       end
     end
 

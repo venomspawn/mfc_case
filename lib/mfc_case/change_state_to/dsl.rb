@@ -17,7 +17,7 @@ module MFCCase
       # Создаёт и возвращает ассоциативный массив с предоставленными ключами,
       # значения которого равны `nil`
       def blank(*keys)
-        args.each_with_object({}) { |arg, memo| memo[arg] = nil }
+        keys.each_with_object({}) { |key, memo| memo[key] = nil }
       end
     end
   end
