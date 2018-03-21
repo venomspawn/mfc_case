@@ -18,7 +18,7 @@ module CaseCore
             memo << [case_id, name.to_s, value]
           end
         end
-        Models::CaseAttribute.import(%i(case_id name value), values)
+        Models::CaseAttribute.import(%i[case_id name value], values)
       end
 
       # Возвращает ассоциативный массив атрибутов записи заявки

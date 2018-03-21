@@ -68,7 +68,7 @@ module MFCCase
         end
 
         # Регулярное выражение для извлечения типа модуля бизнес-логики
-        TYPE_REGEXP = /lib\/([^\/].*)\/base\/state_driven_fsa/
+        TYPE_REGEXP = %r{lib\/([^\/].*)\/base\/state_driven_fsa}
 
         # Извлекает тип модуля бизнес-логики из пути текущего файла
         # @return [String]

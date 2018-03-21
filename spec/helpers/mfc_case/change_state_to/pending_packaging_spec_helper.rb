@@ -31,7 +31,7 @@ module MFCCase
         pending_register_operator_position
         pending_register_operator_surname
         pending_register_sending_date
-      ]
+      ].freeze
 
       # Создаёт запись заявки с необходимыми атрибутами
       # @param [Object] state

@@ -4,7 +4,9 @@ load "#{__dir__}/base/state_driven_fsa.rb"
 
 module MFCCase
   # Класс обработчиков события изменения состояния заявки
+  # rubocop: disable Metrics/ClassLength
   class ChangeStateTo < Base::StateDrivenFSA
+    # rubocop: enable Metrics/ClassLength
     load "#{__dir__}/change_state_to/dsl.rb"
     load "#{__dir__}/change_state_to/errors.rb"
 
@@ -21,13 +23,12 @@ module MFCCase
       closed:     'Закрыта'
     }.freeze
 
-
     # Событие A (см. `docs/STATES.md`)
     edge nil: :packaging,
          set: {
            case_creation_date: :now,
            case_id: :case_id,
-           case_status: CASE_STATUS[:packaging],
+           case_status: CASE_STATUS[:packaging]
          }
 
     # B1
@@ -55,7 +56,7 @@ module MFCCase
              :pending_register_operator_position,
              :pending_register_operator_surname
            )
-        }
+         }
 
     # B2
     edge pending: :packaging,
@@ -89,7 +90,7 @@ module MFCCase
 
     # B3
     edge pending: :processing,
-         need:    %w(issue_method rejecting_date),
+         need:    %w[issue_method rejecting_date],
          check:   -> { !issuance_in_institution? && !rejected? },
          raise:   Errors::PendingProcessing,
          set: {
@@ -176,7 +177,7 @@ module MFCCase
 
     # B6
     edge pending: :closed,
-         need:    %w(issue_method rejecting_date),
+         need:    %w[issue_method rejecting_date],
          check:   -> { issuance_in_institution? || rejected? },
          raise:   Errors::PendingClosed,
          set: {
@@ -235,7 +236,7 @@ module MFCCase
          raise:    Errors::IssuanceRejecting,
          set: {
            case_status: CASE_STATUS[:rejecting],
-           rejecting_date: :now,
+           rejecting_date: :now
          }
 
     # B9

@@ -23,7 +23,7 @@ module MFCCase
           state:                  'issuance',
           planned_rejecting_date: { max: yesterday.to_s }
         },
-        fields: %i(id)
+        fields: %i[id]
       }
     end
 

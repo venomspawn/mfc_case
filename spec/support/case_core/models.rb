@@ -183,7 +183,7 @@ module CaseCore
       end
     end
 
-    Case          = Model.new %i(id type created_at)
-    CaseAttribute = Model.new %i(case_id name value)
+    Case          = Model.new %i[id type created_at]
+    CaseAttribute = Model.new %i[case_id name value]
   end
 end

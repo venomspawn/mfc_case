@@ -54,7 +54,7 @@ FactoryGirl.define do
       y = year  || create(:integer, range: 1980..2000).to_s
       m = month || create(:integer, range: 1..12).to_s
       d = day   || create(:integer, range: 1..28).to_s
-      DateTime.strptime("#{y}.#{m}.#{d}", '%Y.%m.%d')
+      Date.parse("#{y}-#{m}-#{d}")
     end
   end
 
@@ -71,7 +71,7 @@ FactoryGirl.define do
       s = seconds || create(:integer, range: 0..59).to_s
       m = minutes || create(:integer, range: 0..59).to_s
       h = hours   || create(:integer, range: 0..23).to_s
-      DateTime.strptime("#{h}:#{m}:#{s}", '%H:%M:%S')
+      Time.parse("#{h}:#{m}:#{s}")
     end
   end
 

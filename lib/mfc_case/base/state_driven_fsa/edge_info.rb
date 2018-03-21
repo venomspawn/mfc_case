@@ -66,17 +66,17 @@ module MFCCase
             set: {
               type: :object,
               additionalProperties: {
-                type: %i(null string)
+                type: %i[null string]
               }
             },
             need: {
-              type: %i(string array),
+              type: %i[string array],
               items: {
                 type: :string
               }
             }
           }
-        }
+        }.freeze
 
         # Проверяет структуру аргумента конструктора экземпляров класса
         # @param [Object] options

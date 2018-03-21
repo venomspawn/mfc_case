@@ -39,7 +39,7 @@ RSpec.describe MFCCase do
   describe 'the module' do
     subject { described_class }
 
-    methods = %i(change_state_to on_case_creation on_load on_unload)
+    methods = %i[change_state_to on_case_creation on_load on_unload]
     it { is_expected.to respond_to(*methods) }
   end
 
