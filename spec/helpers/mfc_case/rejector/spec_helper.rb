@@ -69,17 +69,17 @@ module MFCCase
         case_attributes(c4s3.id)[:state]
       end
 
-      # Возвращает значение атрибута `added_to_rejecting_at` заявки
+      # Возвращает значение атрибута `rejecting_date` заявки
       #
       # @param [CaseCore::Models::Case] c4s3
       #   запись заявки
       #
       # @return [NilClass, Time]
-      #   значение атрибута `added_to_rejecting_at` или `nil`, если атрибут
+      #   значение атрибута `rejecting_date` или `nil`, если атрибут
       #   отсутствует или его значение пусто
       #
-      def case_added_to_rejecting_at(c4s3)
-        case_time_at(c4s3, :added_to_rejecting_at)
+      def case_rejecting_date(c4s3)
+        case_time_at(c4s3, :rejecting_date)
       end
     end
   end
