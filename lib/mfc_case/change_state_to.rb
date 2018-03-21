@@ -1,4 +1,4 @@
-# encoding: utf-8
+# frozen_string_literal: true
 
 load "#{__dir__}/base/state_driven_fsa.rb"
 
