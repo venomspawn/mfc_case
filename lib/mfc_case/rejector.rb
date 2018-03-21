@@ -25,9 +25,9 @@ module MFCCase
       yesterday = Date.today - 1
       {
         filter: {
-          type:                  'mfc_case',
-          state:                 'issuance',
-          rejecting_expected_at: { max: yesterday.to_s }
+          type:                   'mfc_case',
+          state:                  'issuance',
+          planned_rejecting_date: { max: yesterday.to_s }
         },
         fields: %i(id)
       }
@@ -44,9 +44,10 @@ module MFCCase
     #
     def self.update_params(cases)
       {
-        id:                    cases.map { |c4s3| c4s3[:id] },
-        state:                 'rejecting',
-        added_to_rejecting_at: Time.now.strftime('%F %T')
+        id:             cases.map { |c4s3| c4s3[:id] },
+        state:          'rejecting',
+        case_status:    ChangeStateTo::CASE_STATUS[:rejecting],
+        rejecting_date: Time.now.strftime('%F %T')
       }
     end
 
