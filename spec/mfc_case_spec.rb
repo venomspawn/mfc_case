@@ -1,10 +1,7 @@
 # encoding: utf-8
 
-# @author Александр Ильчуков <a.s.ilchukov@cit.rkomi.ru>
-#
 # Файл тестирования модуля `MFCCase`, предоставляющего обработчики событий
 # бизнес-логики неавтоматизированной услуги
-#
 
 RSpec.shared_examples 'an attributes setter' do |names|
   names.each do |name|

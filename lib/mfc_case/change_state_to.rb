@@ -3,10 +3,7 @@
 load "#{__dir__}/base/state_driven_fsa.rb"
 
 module MFCCase
-  # @author Александр Ильчуков <a.s.ilchukov@cit.rkomi.ru>
-  #
   # Класс обработчиков события изменения состояния заявки
-  #
   class ChangeStateTo < Base::StateDrivenFSA
     load "#{__dir__}/change_state_to/dsl.rb"
     load "#{__dir__}/change_state_to/errors.rb"
@@ -271,29 +268,22 @@ module MFCCase
 
     private
 
-    # @author Александр Ильчуков <a.s.ilchukov@cit.rkomi.ru>
-    #
     # Модуль методов, подключаемых к объекту, в контексте которого происходят
     # проверки атрибутов при переходе по дуге графа переходов состояния заявки
-    #
     module CheckContextMethods
       # Возвращает, предполагается ли выдача результатов оказания услуги
       # непосредственно в ведомстве
-      #
       # @return [Boolean]
       #   предполагается ли выдача результатов оказания услуги непосредственно
       #   в ведомстве
-      #
       def issuance_in_institution?
         issue_method == 'institution'
       end
 
       # Возвращает, присутствует ли атрибут `rejecting_date` с непустым
       # значением
-      #
       # @return [Boolean]
       #   присутствует ли атрибут `rejecting_date` с непустым значением
-      #
       def rejected?
         !rejecting_date.nil?
       end
@@ -302,10 +292,8 @@ module MFCCase
     # Дополняет объект, в контексте которого происходят проверки атрибутов при
     # переходе по дуге графа переходов состояния заявки, методами модуля
     # `CheckContextMethods`
-    #
     # @return [Object]
     #   результирующий объект
-    #
     def check_context
       super.extend(CheckContextMethods)
     end

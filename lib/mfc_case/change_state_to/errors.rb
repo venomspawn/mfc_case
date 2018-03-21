@@ -2,22 +2,14 @@
 
 module MFCCase
   class ChangeStateTo
-    # @author Александр Ильчуков <a.s.ilchukov@cit.rkomi.ru>
-    #
     # Пространство имён классов ошибок, используемых содержащим классом
-    #
     module Errors
-      # @author Александр Ильчуков <a.s.ilchukov@cit.rkomi.ru>
-      #
       # Класс ошибок, сигнализирующих о том, что невозможно перевести заявку
       # из состояния `pending` в состояние `packaging`
-      #
       class PendingPackaging < RuntimeError
         # Инициализирует объект класса
-        #
         # @param [CaseCore::Models::Case] c4s3
         #   запись заявки
-        #
         def initialize(c4s3)
           super(<<-MESSAGE.squish)
             Невозможно перевести заявку с идентификатором `#{c4s3.id}` из
@@ -28,17 +20,12 @@ module MFCCase
         end
       end
 
-      # @author Александр Ильчуков <a.s.ilchukov@cit.rkomi.ru>
-      #
       # Класс ошибок, сигнализирующих о том, что невозможно перевести заявку
       # из состояния `pending` в состояние `processing`
-      #
       class PendingProcessing < RuntimeError
         # Инициализирует объект класса
-        #
         # @param [CaseCore::Models::Case] c4s3
         #   запись заявки
-        #
         def initialize(c4s3)
           super(<<-MESSAGE.squish)
             Невозможно перевести заявку с идентификатором `#{c4s3.id}` из
@@ -50,17 +37,12 @@ module MFCCase
         end
       end
 
-      # @author Александр Ильчуков <a.s.ilchukov@cit.rkomi.ru>
-      #
       # Класс ошибок, сигнализирующих о том, что невозможно перевести заявку
       # из состояния `pending` в состояние `rejecting`
-      #
       class PendingRejecting < RuntimeError
         # Инициализирует объект класса
-        #
         # @param [CaseCore::Models::Case] c4s3
         #   запись заявки
-        #
         def initialize(c4s3)
           super(<<-MESSAGE.squish)
             Невозможно перевести заявку с идентификатором `#{c4s3.id}` из
@@ -71,17 +53,12 @@ module MFCCase
         end
       end
 
-      # @author Александр Ильчуков <a.s.ilchukov@cit.rkomi.ru>
-      #
       # Класс ошибок, сигнализирующих о том, что невозможно перевести заявку
       # из состояния `pending` в состояние `closed`
-      #
       class PendingClosed < RuntimeError
         # Инициализирует объект класса
-        #
         # @param [CaseCore::Models::Case] c4s3
         #   запись заявки
-        #
         def initialize(c4s3)
           super(<<-MESSAGE.squish)
             Невозможно перевести заявку с идентификатором `#{c4s3.id}` из
@@ -93,17 +70,12 @@ module MFCCase
         end
       end
 
-      # @author Александр Ильчуков <a.s.ilchukov@cit.rkomi.ru>
-      #
       # Класс ошибок, сигнализирующих о том, что невозможно перевести заявку
       # из состояния `issuance` в состояние `rejecting`
-      #
       class IssuanceRejecting < RuntimeError
         # Инициализирует объект класса
-        #
         # @param [CaseCore::Models::Case] c4s3
         #   запись заявки
-        #
         def initialize(c4s3)
           super(<<-MESSAGE.squish)
             Невозможно перевести заявку с идентификатором `#{c4s3.id}` из
@@ -114,17 +86,12 @@ module MFCCase
         end
       end
 
-      # @author Александр Ильчуков <a.s.ilchukov@cit.rkomi.ru>
-      #
       # Класс ошибок, сигнализирующих о том, что невозможно перевести заявку
       # из состояния `issuance` в состояние `closed`
-      #
       class IssuanceClosed < RuntimeError
         # Инициализирует объект класса
-        #
         # @param [CaseCore::Models::Case] c4s3
         #   запись заявки
-        #
         def initialize(c4s3)
           super(<<-MESSAGE.squish)
             Невозможно перевести заявку с идентификатором `#{c4s3.id}` из

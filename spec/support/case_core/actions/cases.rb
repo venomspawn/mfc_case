@@ -1,18 +1,13 @@
 # encoding: utf-8
 
-# @author Александр Ильчуков <a.s.ilchukov@cit.rkomi.ru>
-#
 # Файл поддержки эмуляции действий сервиса `case_core`
-#
 
 module CaseCore
   module Actions
     module Cases
       # Обновляет записи атрибутов, связанных с записью заявки
-      #
       # @param [Hash]
       #   ассоциативный массив значений атрибутов
-      #
       def self.update(params)
         case_ids = Array(params[:id])
         attrs = params.except(:id)
@@ -27,13 +22,10 @@ module CaseCore
       end
 
       # Возвращает ассоциативный массив атрибутов записи заявки
-      #
       # @param [Hash{:id => String}] params
       #   ассоциативный массив параметров
-      #
       # @return [Hash]
       #   результирующий ассоциативный массив
-      #
       def self.show_attributes(params)
         args = { case_id: params[:id] }
         args[:name] = params[:names] unless params[:names].nil?
@@ -45,13 +37,10 @@ module CaseCore
 
       # Возвращает список ассоциативных массивов с идентификаторами заявок,
       # удовлетворяющих предоставленным условиям
-      #
       # @param [Hash] params
       #   ассоциативный массив параметров
-      #
       # @return [Array<Hash>]
       #   результирующий список
-      #
       def self.index(params)
         attributes = Models::CaseAttribute
         args = { name: 'state', value: 'issuance' }

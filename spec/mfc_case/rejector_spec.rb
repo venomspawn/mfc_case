@@ -1,9 +1,6 @@
 # encoding: utf-8
 
-# @author Александр Ильчуков <a.s.ilchukov@cit.rkomi.ru>
-#
 # Файл тестирования модуля `MFCCase::Rejector`
-#
 
 RSpec.describe MFCCase::Rejector do
   describe 'the module' do
