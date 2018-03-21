@@ -1,15 +1,11 @@
-# encoding: utf-8
+# frozen_string_literal: true
 
-# @author Александр Ильчуков <a.s.ilchukov@cit.rkomi.ru>
-#
 # Фабрика значений
-#
 
 FactoryGirl.define do
   sequence(:uniq)
 
   # Целые числа в заданном диапазоне или без него
-  #
   factory :integer do
     transient do
       range nil
@@ -26,7 +22,6 @@ FactoryGirl.define do
   end
 
   # Строки
-  #
   factory :string do
     transient do
       length nil
@@ -37,7 +32,6 @@ FactoryGirl.define do
   end
 
   # Строки шестнадцатеричных чисел
-  #
   factory :hex, class: String do
     transient do
       length nil
@@ -48,7 +42,6 @@ FactoryGirl.define do
   end
 
   # Даты без времени
-  #
   factory :date do
     transient do
       year  nil
@@ -61,12 +54,11 @@ FactoryGirl.define do
       y = year  || create(:integer, range: 1980..2000).to_s
       m = month || create(:integer, range: 1..12).to_s
       d = day   || create(:integer, range: 1..28).to_s
-      DateTime.strptime("#{y}.#{m}.#{d}", '%Y.%m.%d')
+      Date.parse("#{y}-#{m}-#{d}")
     end
   end
 
   # Время без даты
-  #
   factory :time do
     transient do
       seconds nil
@@ -79,12 +71,11 @@ FactoryGirl.define do
       s = seconds || create(:integer, range: 0..59).to_s
       m = minutes || create(:integer, range: 0..59).to_s
       h = hours   || create(:integer, range: 0..23).to_s
-      DateTime.strptime("#{h}:#{m}:#{s}", '%H:%M:%S')
+      Time.parse("#{h}:#{m}:#{s}")
     end
   end
 
   # Время с датой
-  #
   factory :full_time, class: Time do
     transient do
       year  nil
@@ -108,14 +99,12 @@ FactoryGirl.define do
   end
 
   # Булевы значения
-  #
   factory :boolean, class: Object do
     skip_create
     initialize_with { generate(:uniq).even? }
   end
 
   # Перечислимые значения
-  #
   factory :enum, class: Object do
     transient do
       values nil
@@ -128,14 +117,12 @@ FactoryGirl.define do
   end
 
   # URL
-  #
   factory :url, class: String do
     skip_create
     initialize_with { "http://www.example.com/#{create(:string)}" }
   end
 
   # Содержимое в Base64
-  #
   factory :base64, class: String do
     skip_create
     initialize_with { Base64.encode64(create(:string)) }

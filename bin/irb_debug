@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
 
 # @author Александр Ильчуков <a.s.ilchukov@cit.rkomi.ru>
 #

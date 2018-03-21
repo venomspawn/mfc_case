@@ -1,10 +1,7 @@
-# encoding: utf-8
+# frozen_string_literal: true
 
-# @author Александр Ильчуков <a.s.ilchukov@cit.rkomi.ru>
-#
 # Файл тестирования модуля `MFCCase`, предоставляющего обработчики событий
 # бизнес-логики неавтоматизированной услуги
-#
 
 RSpec.shared_examples 'an attributes setter' do |names|
   names.each do |name|
@@ -42,7 +39,7 @@ RSpec.describe MFCCase do
   describe 'the module' do
     subject { described_class }
 
-    methods = %i(change_state_to on_case_creation on_load on_unload)
+    methods = %i[change_state_to on_case_creation on_load on_unload]
     it { is_expected.to respond_to(*methods) }
   end
 

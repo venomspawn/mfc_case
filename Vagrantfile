@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
@@ -18,7 +20,8 @@ Vagrant.configure(2) do |config|
     dev.vm.post_up_message = <<-POST_UP_MESSAGE
       Machine is up and ready to development. Use `vagrant ssh` to enter.
     POST_UP_MESSAGE
-    dev.ssh.forward_agent  = true
+
+    dev.ssh.forward_agent = true
 
     dev.vm.provision :shell, keep_color: true, inline: <<-PROVISION
       echo 'StrictHostKeyChecking no' > ~/.ssh/config
