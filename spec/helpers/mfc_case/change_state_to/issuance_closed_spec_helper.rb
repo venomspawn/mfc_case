@@ -18,14 +18,14 @@ module MFCCase
       # @param [Object] state
       #   статус заявки
       #
-      # @param [Object] rejecting_expected_at
+      # @param [Object] planned_rejecting_date
       #   дата, после которой результат заявки невозможно выдать
       #
       # @return [CaseCore::Models::Case]
       #   созданная запись заявки
       #
-      def create_case(state, rejecting_expected_at)
-        super(state, rejecting_expected_at: rejecting_expected_at)
+      def create_case(state, planned_rejecting_date)
+        super(state, planned_rejecting_date: planned_rejecting_date)
       end
     end
   end

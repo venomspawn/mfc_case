@@ -19,10 +19,10 @@ RSpec.describe MFCCase::Rejector do
 
     let!(:rotten_case) { create_case('issuance', **rotten_args) }
     let!(:another_rotten_case) { create_case('issuance', **rotten_args) }
-    let(:rotten_args) { { rejecting_expected_at: yesterday.to_s } }
+    let(:rotten_args) { { planned_rejecting_date: yesterday.to_s } }
     let(:yesterday) { Date.today - 1 }
     let!(:fresh_case) { create_case('issuance', **fresh_args) }
-    let(:fresh_args) { { rejecting_expected_at: tomorrow.to_s } }
+    let(:fresh_args) { { planned_rejecting_date: tomorrow.to_s } }
     let(:tomorrow) { Date.today + 1 }
     let!(:other_case) { create_case('processing', {}) }
 
@@ -33,11 +33,11 @@ RSpec.describe MFCCase::Rejector do
         expect(case_state(another_rotten_case)).to be == 'rejecting'
       end
 
-      it 'should set `added_to_rejecting_at` attribute of all of the cases' do
+      it 'should set `rejecting_date` attribute of all of the cases' do
         subject
-        expect(case_added_to_rejecting_at(rotten_case))
+        expect(case_rejecting_date(rotten_case))
           .to be_within(1).of(Time.now)
-        expect(case_added_to_rejecting_at(another_rotten_case))
+        expect(case_rejecting_date(another_rotten_case))
           .to be_within(1).of(Time.now)
       end
     end
@@ -46,7 +46,7 @@ RSpec.describe MFCCase::Rejector do
       it 'shouldn\'t touch\'em' do
         subject
         expect(case_state(fresh_case)).to be == 'issuance'
-        expect(case_added_to_rejecting_at(fresh_case)).to be_nil
+        expect(case_rejecting_date(fresh_case)).to be_nil
       end
     end
 
@@ -54,7 +54,7 @@ RSpec.describe MFCCase::Rejector do
       it 'shouldn\'t touch\'em' do
         subject
         expect(case_state(other_case)).to be == 'processing'
-        expect(case_added_to_rejecting_at(other_case)).to be_nil
+        expect(case_rejecting_date(other_case)).to be_nil
       end
     end
   end

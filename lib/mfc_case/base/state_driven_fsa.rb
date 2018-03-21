@@ -181,36 +181,60 @@ module MFCCase
       #   состояния заявки
       #
       def update_case_attributes(edge_info)
-        set = edge_info.set || {}
-        values = set.each_value.map(&method(:obtain_value))
-        attrs = Hash[set.keys.zip(values)]
+        attrs = new_case_attributes(edge_info)
         CaseCore::Actions::Cases.update(id: c4s3.id, state: state, **attrs)
       end
 
-      # Возвращает значение согласно следующим проверкам.
-      #
-      # *   Если аргумент является названием метода экземпляра класса, то
-      #     возвращает результат вызова метода без аргументов.
-      # *   Если аргумент не является названием метода экземпляра класса, то
-      #     проверяется, является ли он ключом ассоциативного массива `params`.
-      #     Если это так, то возвращается значение по этому ключу, иначе
-      #     возвращается аргумент.
-      #
+      # Составляет ассоциативный массив новых атрибутов заявки и возвращает его
+      # @param [EdgeInfo] edge_info
+      #   объект с информацией о переходе по дуге графа переходов состояний
+      #   состояния заявки
+      # @return [Hash]
+      #   результирующий ассоциативный массив
+      def new_case_attributes(edge_info)
+        set = edge_info.set || {}
+        set.each_with_object({}) do |(key, value_info), memo|
+          value, skip = obtain_value(value_info)
+          memo[key] = value unless skip
+        end
+      end
+
+      # Возвращает список из двух элементов: извлечённого по аргументу значения
+      # и булева флага, сигнализирующего о том, надо ли пропустить это значение
+      # в ассоциативном массиве атрибутов
       # @param [Object] value_info
       #   аргумент
-      #
-      # @return [Object]
-      #   результирующее значение
-      #
+      # @return [Array<(Object, Boolean)>]
+      #   список из двух элементов: извлечённого по аргументу значения и булева
+      #   флага, сигнализирующего о том, надо ли пропустить это значение в
+      #   ассоциативном массиве атрибутов
       def obtain_value(value_info)
-        return value_info unless value_info.is_a?(String) ||
-                                 value_info.is_a?(Symbol)
+        case value_info
+        when String then extract_value(value_info, false)
+        when Symbol then extract_value(value_info, true)
+        else [value_info, false]
+        end
+      end
+
+      # Возвращает список из двух элементов: извлечённого по аргументу
+      # `value_info` значения и булева флага, сигнализирующего о том, надо ли
+      # пропустить это значение в ассоциативном массиве атрибутов
+      # @param [String, Symbol] value_info
+      #   название метода экземпляра класса или ключа параметров
+      # @param [Boolean] skip
+      #   надо ли пропустить значение, если значение `value_info` не является
+      #   названием ни метода экземпляра класса, ни ключа параметров
+      # @return [Array<(Object, Boolean)>]
+      #   список из двух элементов: извлечённого по аргументу `value_info`
+      #   значения и булева флага, сигнализирующего о том, надо ли пропустить
+      #   это значение в ассоциативном массиве атрибутов
+      def extract_value(value_info, skip)
         if respond_to?(value_info, true)
-          send(value_info)
-        elsif params.key?(value_info)
-          params[value_info]
+          [send(value_info), false]
+        elsif params.key?(value_info.to_sym)
+          [params[value_info.to_sym], false]
         else
-          value_info
+          [value_info, skip]
         end
       end
 
