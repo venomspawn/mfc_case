@@ -24,18 +24,22 @@ module MFCCase
     }.freeze
 
     # Событие A (см. `docs/STATES.md`)
-    edge nil: :packaging,
+    edge nil:  :packaging,
+         need: :planned_sending_date,
          set: {
            case_creation_date: :now,
            case_id: :case_id,
-           case_status: CASE_STATUS[:packaging]
+           case_status: CASE_STATUS[:packaging],
+           planned_finish_date: :planned_sending_date
          }
 
     # B1
     edge packaging: :pending,
+         need: :planned_sending_date,
          set: {
            case_status: CASE_STATUS[:pending],
            pending_register_sending_date: :now,
+           planned_finish_date: :planned_sending_date,
            **from_params_with_the_same_names(
              :pending_register_institution_name,
              :pending_register_institution_office_building,
@@ -60,11 +64,12 @@ module MFCCase
 
     # B2
     edge pending: :packaging,
-         need:    :rejecting_date,
+         need:    %i[rejecting_date planned_sending_date],
          check:   -> { !rejected? },
          raise:   Errors::PendingPackaging,
          set: {
            case_status: CASE_STATUS[:packaging],
+           planned_finish_date: :planned_sending_date,
            **blank(
              :pending_register_institution_name,
              :pending_register_institution_office_building,
@@ -90,12 +95,13 @@ module MFCCase
 
     # B3
     edge pending: :processing,
-         need:    %w[issue_method rejecting_date],
+         need:    %w[issue_method rejecting_date planned_receiving_date],
          check:   -> { !issuance_in_institution? && !rejected? },
          raise:   Errors::PendingProcessing,
          set: {
            case_status: CASE_STATUS[:processing],
            processing_sending_date: :now,
+           planned_finish_data: :planned_receiving_date,
            **from_params_with_the_same_names(
              :processing_institution_name,
              :processing_institution_office_building,
@@ -120,11 +126,12 @@ module MFCCase
 
     # B4
     edge pending: :rejecting,
-         need:    :rejecting_date,
+         need:    %i[rejecting_date planned_rejecting_finish_date],
          check:   -> { rejected? },
          raise:   Errors::PendingRejecting,
          set: {
            case_status: CASE_STATUS[:rejecting],
+           planned_finish_date: :planned_rejecting_finish_date,
            **blank(
              :pending_rejecting_register_institution_name,
              :pending_rejecting_register_institution_office_building,
@@ -150,9 +157,11 @@ module MFCCase
 
     # B5
     edge rejecting: :pending,
+         need:      :planned_rejecting_finish_date,
          set: {
            case_status: CASE_STATUS[:pending],
            pending_rejecting_register_sending_date: :now,
+           planned_finish_date: :planned_rejecting_finish_date,
            **from_params_with_the_same_names(
              :pending_rejecting_register_institution_name,
              :pending_rejecting_register_institution_office_building,
@@ -183,6 +192,7 @@ module MFCCase
          set: {
            case_status: CASE_STATUS[:closed],
            closed_date: :now,
+           planned_finish_date: nil,
            **from_params_with_the_same_names(
              :closed_office_mfc_building,
              :closed_office_mfc_city,
@@ -205,9 +215,11 @@ module MFCCase
 
     # B7
     edge processing: :issuance,
+         need:       :planned_issuance_finish_date,
          set: {
            case_status: CASE_STATUS[:issuance],
            issuance_receiving_date: :now,
+           planned_finish_date: :planned_issuance_finish_date,
            **from_params_with_the_same_names(
              :issuance_office_mfc_building,
              :issuance_office_mfc_city,
@@ -231,12 +243,13 @@ module MFCCase
 
     # B8
     edge issuance: :rejecting,
-         need:     :planned_rejecting_date,
+         need:     %i[planned_rejecting_date planned_rejecting_finish_date],
          check:    -> { planned_rejecting_date.to_date <= Date.today },
          raise:    Errors::IssuanceRejecting,
          set: {
            case_status: CASE_STATUS[:rejecting],
-           rejecting_date: :now
+           rejecting_date: :now,
+           planned_finish_date: :planned_rejecting_finish_date
          }
 
     # B9
@@ -247,6 +260,7 @@ module MFCCase
          set: {
            case_status: CASE_STATUS[:closed],
            closed_date: :now,
+           planned_finish_date: nil,
            **from_params_with_the_same_names(
              :closed_office_mfc_building,
              :closed_office_mfc_city,
@@ -304,6 +318,40 @@ module MFCCase
     #   идентификатор записи заявки
     def case_id
       c4s3.id
+    end
+
+    # Возвращает строку с плановой датой, после которой результат оказания
+    # услуги должен отправляться на возврат в ведомство.
+    # @return [String]
+    #   строка с плановой датой, после которой результат оказания услуги должен
+    #   отправляться на возврат в ведомство.
+    def planned_issuance_finish_date
+      case_attributes[:planned_issuance_finish_date]
+    end
+
+    # Возвращает строку с плановой датой получения результата оказания услуги
+    # из ведомства
+    # @return [String]
+    #   строка с плановой датой получения результата оказания услуги из
+    #   ведомства
+    def planned_receiving_date
+      case_attributes[:planned_receiving_date]
+    end
+
+    # Возвращает строку с плановой датой отправки документов заявки в ведомство
+    # @return [String]
+    #   строка с плановой датой отправки документов заявки в ведомство
+    def planned_sending_date
+      case_attributes[:planned_sending_date]
+    end
+
+    # Возвращает строку с плановой датой, после которой возврат результата
+    # оказания услуги должен считаться просроченным
+    # @return [String]
+    #   строка с плановой датой, после которой возврат результата оказания
+    #   услуги должен считаться просроченным
+    def planned_rejecting_finish_date
+      case_attributes[:planned_rejecting_finish_date]
     end
   end
 end
