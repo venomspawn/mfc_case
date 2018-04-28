@@ -17,8 +17,8 @@ module MFCCase
       #   созданная запись заявки
       def create_case(state)
         attributes = {
-          institution_rguid: FactoryGirl.create(:string),
-          back_office_id:    FactoryGirl.create(:string)
+          institution_rguid: FactoryBot.create(:string),
+          back_office_id:    FactoryBot.create(:string)
         }
         super(state, attributes)
       end

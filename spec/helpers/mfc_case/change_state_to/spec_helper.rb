@@ -13,9 +13,9 @@ module MFCCase
       # @return [CaseCore::Models::Case]
       #   созданная запись заявки
       def create_case(state, attributes)
-        FactoryGirl.create(:case, type: 'mfc_case').tap do |c4s3|
+        FactoryBot.create(:case, type: 'mfc_case').tap do |c4s3|
           attributes = { case_id: c4s3.id, state: state.to_s, **attributes }
-          FactoryGirl.create(:case_attributes, **attributes)
+          FactoryBot.create(:case_attributes, **attributes)
         end
       end
 

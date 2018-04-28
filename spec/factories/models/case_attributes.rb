@@ -2,7 +2,7 @@
 
 # Фабрика записей атрибутов заявок
 
-FactoryGirl.define do
+FactoryBot.define do
   factory :case_attribute, class: CaseCore::Models::CaseAttribute do
     name    { create(:string) }
     value   { create(:string) }

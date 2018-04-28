@@ -1,9 +1,9 @@
 GEM
-  remote: https://rubygems.org/
+  remote: http://repo.it2.vm/repository/gem-group/
   specs:
-    activesupport (5.1.4)
+    activesupport (5.2.0)
       concurrent-ruby (~> 1.0, >= 1.0.2)
-      i18n (~> 0.7)
+      i18n (>= 0.7, < 2)
       minitest (~> 5.1)
       tzinfo (~> 1.1)
     addressable (2.5.2)
@@ -11,17 +11,17 @@ GEM
     awesome_print (1.8.0)
     concurrent-ruby (1.0.5)
     diff-lcs (1.3)
-    et-orbi (1.0.9)
+    et-orbi (1.1.0)
       tzinfo
-    factory_girl (4.9.0)
+    factory_bot (4.8.2)
       activesupport (>= 3.0.0)
-    i18n (0.9.4)
+    i18n (1.0.1)
       concurrent-ruby (~> 1.0)
     json-schema (2.8.0)
       addressable (>= 2.4)
     minitest (5.11.3)
     public_suffix (3.0.2)
-    rake (12.3.0)
+    rake (12.3.1)
     rspec (3.7.0)
       rspec-core (~> 3.7.0)
       rspec-expectations (~> 3.7.0)
@@ -48,7 +48,7 @@ PLATFORMS
 DEPENDENCIES
   activesupport
   awesome_print
-  factory_girl
+  factory_bot
   json-schema
   rake
   rspec
