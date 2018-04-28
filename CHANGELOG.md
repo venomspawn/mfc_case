@@ -1,5 +1,9 @@
 # Журнал изменений
 
+## [0.6.2] — 28.04.2018
+
+-   Переведены тесты с `factory_girl` на `factory_bot` (#12)
+
 ## [0.6.1] — 28.04.2018
 
 -   Добавлена поддержка непрерывной интеграции Gitlab (#11)
@@ -33,6 +37,7 @@
 -   Создана базовая инфраструктура (#1)
 -   Перенесены бизнес-логика и тесты из сервиса `case_core` (#2)
 
+[0.6.2]: http://gitlab.it.vm/gems/mfc_case/compare/0.6.1...0.6.2
 [0.6.1]: http://gitlab.it.vm/gems/mfc_case/compare/0.6.0...0.6.1
 [0.6.0]: http://gitlab.it.vm/gems/mfc_case/compare/0.5.0...0.6.0
 [0.5.0]: http://gitlab.it.vm/gems/mfc_case/compare/0.4.0...0.5.0
