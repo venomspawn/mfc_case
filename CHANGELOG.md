@@ -1,5 +1,9 @@
 # Журнал изменений
 
+## [0.6.1] — 28.04.2018
+
+-   Добавлена поддержка непрерывной интеграции Gitlab (#11)
+
 ## [0.6.0] — 30.03.2018
 
 -   Добавлена поддержка технического атрибута `planned_finish_date` (#10)
@@ -29,7 +33,8 @@
 -   Создана базовая инфраструктура (#1)
 -   Перенесены бизнес-логика и тесты из сервиса `case_core` (#2)
 
-[0.5.0]: http://gitlab.it.vm/gems/mfc_case/compare/0.5.0...0.6.0
+[0.6.1]: http://gitlab.it.vm/gems/mfc_case/compare/0.6.0...0.6.1
+[0.6.0]: http://gitlab.it.vm/gems/mfc_case/compare/0.5.0...0.6.0
 [0.5.0]: http://gitlab.it.vm/gems/mfc_case/compare/0.4.0...0.5.0
 [0.4.0]: http://gitlab.it.vm/gems/mfc_case/compare/0.3.0...0.4.0
 [0.3.0]: http://gitlab.it.vm/gems/mfc_case/compare/0.2.0...0.3.0
