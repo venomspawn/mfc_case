@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-# Поддержка эмуляции моделей в FactoryGirl
+# Поддержка эмуляции моделей в FactoryBot
 
-FactoryGirl.define do
+FactoryBot.define do
   to_create { |obj| obj.class.datalist << obj }
 end

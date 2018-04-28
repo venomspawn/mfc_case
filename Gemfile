@@ -10,6 +10,6 @@ gem 'yard'
 
 group :development, :test do
   gem 'awesome_print'
-  gem 'factory_girl'
+  gem 'factory_bot'
   gem 'rspec'
 end
