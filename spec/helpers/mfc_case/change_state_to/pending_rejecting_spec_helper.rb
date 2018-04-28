@@ -42,7 +42,7 @@ module MFCCase
       #   созданная запись заявки
       def create_case(state, rejecting_date)
         attributes = ATTRIBUTE_NAMES.each_with_object({}) do |name, memo|
-          memo[name] = FactoryGirl.create(:string)
+          memo[name] = FactoryBot.create(:string)
         end
         super(state, rejecting_date: rejecting_date, **attributes)
       end

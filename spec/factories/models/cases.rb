@@ -2,7 +2,7 @@
 
 # Фабрика записей заявок
 
-FactoryGirl.define do
+FactoryBot.define do
   factory :case, class: CaseCore::Models::Case do
     id         { create(:string) }
     type       { create(:string) }

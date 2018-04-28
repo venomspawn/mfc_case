@@ -2,7 +2,7 @@
 
 # Фабрика значений
 
-FactoryGirl.define do
+FactoryBot.define do
   sequence(:uniq)
 
   # Целые числа в заданном диапазоне или без него
