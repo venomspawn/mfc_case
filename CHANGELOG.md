@@ -1,5 +1,9 @@
 # Журнал изменений
 
+## [0.6.3] — 08.05.2018
+
+-   Использован ISO8601 в строках с датой и временем (#13)
+
 ## [0.6.2] — 28.04.2018
 
 -   Переведены тесты с `factory_girl` на `factory_bot` (#12)
@@ -35,8 +39,9 @@
 ## [0.1.0] — 14.02.2018
 
 -   Создана базовая инфраструктура (#1)
--   Перенесены бизнес-логика и тесты из сервиса `case_core` (#2)
+-   Перенесены бизнес-логика и тесты из сервиса `case_manager` (#2)
 
+[0.6.3]: http://gitlab.it.vm/gems/mfc_case/compare/0.6.2...0.6.3
 [0.6.2]: http://gitlab.it.vm/gems/mfc_case/compare/0.6.1...0.6.2
 [0.6.1]: http://gitlab.it.vm/gems/mfc_case/compare/0.6.0...0.6.1
 [0.6.0]: http://gitlab.it.vm/gems/mfc_case/compare/0.5.0...0.6.0
@@ -44,3 +49,4 @@
 [0.4.0]: http://gitlab.it.vm/gems/mfc_case/compare/0.3.0...0.4.0
 [0.3.0]: http://gitlab.it.vm/gems/mfc_case/compare/0.2.0...0.3.0
 [0.2.0]: http://gitlab.it.vm/gems/mfc_case/compare/0.1.0...0.2.0
+[0.1.0]: http://gitlab.it.vm/gems/mfc_case/compare/aad36b323de28da0a086f052ff7c0a37b62490a5...0.1.0
