@@ -345,7 +345,7 @@ RSpec.describe MFCCase do
       include MFCCase::ChangeStateTo::IssuanceClosedSpecHelper
 
       let(:c4s3) { create_case(:issuance, planned_rejecting_date) }
-      let(:planned_rejecting_date) { (Time.now + 86_400).strftime('%F %T') }
+      let(:planned_rejecting_date) { (Time.now + 86_400).strftime('%FT%T') }
       let(:params) { {} }
       let(:state) { 'closed' }
 
@@ -588,7 +588,7 @@ RSpec.describe MFCCase do
       end
 
       context 'when `rejecting_date` value is present' do
-        let(:rejecting_date) { Time.now.strftime('%F %T') }
+        let(:rejecting_date) { Time.now.strftime('%FT%T') }
 
         it 'should raise RuntimeError' do
           expect { subject }.to raise_error(RuntimeError)
