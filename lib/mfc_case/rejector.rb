@@ -38,7 +38,7 @@ module MFCCase
         id:             cases.map { |c4s3| c4s3[:id] },
         state:          'rejecting',
         case_status:    ChangeStateTo::CASE_STATUS[:rejecting],
-        rejecting_date: Time.now.strftime('%F %T')
+        rejecting_date: Time.now.strftime('%FT%T')
       }
     end
 
