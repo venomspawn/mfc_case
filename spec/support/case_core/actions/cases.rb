@@ -35,6 +35,13 @@ module CaseCore
         end
       end
 
+      # Ассоциативный массив с параметрами запроса на извлечение записей заявок
+      # в состоянии `issuance`
+      INDEX_ARGS = { name: 'state', value: 'issuance' }.freeze
+
+      # Путь для извлечения даты из ассоциативного массива параметров
+      DATE_PATH = %i[filter planned_rejecting_date max].freeze
+
       # Возвращает список ассоциативных массивов с идентификаторами заявок,
       # удовлетворяющих предоставленным условиям
       # @param [Hash] params
@@ -43,9 +50,8 @@ module CaseCore
       #   результирующий список
       def self.index(params)
         attributes = Models::CaseAttribute
-        args = { name: 'state', value: 'issuance' }
-        ids1 = attributes.where(args).select(:case_id)
-        planned_rejecting_date = params[:filter][:planned_rejecting_date][:max]
+        ids1 = attributes.where(INDEX_ARGS).select(:case_id)
+        planned_rejecting_date = params.dig(*DATE_PATH)
         ids2 = attributes.datalist.each_with_object([]) do |obj, memo|
           memo << obj.case_id if obj.name == 'planned_rejecting_date' &&
                                  obj.value <= planned_rejecting_date
