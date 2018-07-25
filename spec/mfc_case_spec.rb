@@ -389,24 +389,24 @@ RSpec.describe MFCCase do
         let!(:attrs) { create(:case_attributes, **args) }
         let(:args) { { case_id: c4s3.id, state: 'issuance' } }
 
-        it 'should raise NoMethodError' do
-          expect { subject }.to raise_error(NoMethodError)
+        it 'should set case state to `closed`' do
+          expect { subject }.to change { case_state(c4s3) }.to('closed')
         end
       end
 
       context 'when `planned_rejecting_date` attribute is nil' do
         let(:planned_rejecting_date) { nil }
 
-        it 'should raise NoMethodError' do
-          expect { subject }.to raise_error(NoMethodError)
+        it 'should set case state to `closed`' do
+          expect { subject }.to change { case_state(c4s3) }.to('closed')
         end
       end
 
       context 'when `planned_rejecting_date` attribute value is invalid' do
         let(:planned_rejecting_date) { 'invalid' }
 
-        it 'should raise ArgumentError' do
-          expect { subject }.to raise_error(ArgumentError)
+        it 'should set case state to `closed`' do
+          expect { subject }.to change { case_state(c4s3) }.to('closed')
         end
       end
 
@@ -447,24 +447,24 @@ RSpec.describe MFCCase do
         let!(:attrs) { create(:case_attributes, **args) }
         let(:args) { { case_id: c4s3.id, state: 'issuance' } }
 
-        it 'should raise NoMethodError' do
-          expect { subject }.to raise_error(NoMethodError)
+        it 'should raise RuntimeError' do
+          expect { subject }.to raise_error(RuntimeError)
         end
       end
 
       context 'when `planned_rejecting_date` attribute is nil' do
         let(:planned_rejecting_date) { nil }
 
-        it 'should raise NoMethodError' do
-          expect { subject }.to raise_error(NoMethodError)
+        it 'should raise RuntimeError' do
+          expect { subject }.to raise_error(RuntimeError)
         end
       end
 
       context 'when `planned_rejecting_date` attribute value is invalid' do
         let(:planned_rejecting_date) { 'invalid' }
 
-        it 'should raise ArgumentError' do
-          expect { subject }.to raise_error(ArgumentError)
+        it 'should raise RuntimeError' do
+          expect { subject }.to raise_error(RuntimeError)
         end
       end
 
