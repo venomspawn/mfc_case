@@ -244,7 +244,7 @@ module MFCCase
     # B8
     edge issuance: :rejecting,
          need:     %i[planned_rejecting_date planned_rejecting_finish_date],
-         check:    -> { planned_rejecting_date.to_date <= Date.today },
+         check:    -> { !can_be_issued? },
          raise:    Errors::IssuanceRejecting,
          set: {
            case_status: CASE_STATUS[:rejecting],
@@ -255,7 +255,7 @@ module MFCCase
     # B9
     edge issuance: :closed,
          need:     :planned_rejecting_date,
-         check:    -> { Date.today < planned_rejecting_date.to_date },
+         check:    -> { can_be_issued? },
          raise:    Errors::IssuanceClosed,
          set: {
            case_status: CASE_STATUS[:closed],
@@ -301,6 +301,18 @@ module MFCCase
       #   присутствует ли атрибут `rejecting_date` с непустым значением
       def rejected?
         !rejecting_date.nil?
+      end
+
+      # Возвращает, больше ли дата, представленная в значении атрибута
+      # `planned_rejecting_date`, текущей даты. Возвращает булево значение
+      # `true`, если атрибут `planned_rejecting_date` отсутствует или содержит
+      # значение, из которого невозможно восстановить дату.
+      # @return [Boolean]
+      #   результирующее булево значение
+      def can_be_issued?
+        Date.today < planned_rejecting_date.to_date
+      rescue StandardError
+        true
       end
     end
 
