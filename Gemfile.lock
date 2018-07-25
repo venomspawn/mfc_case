@@ -8,19 +8,30 @@ GEM
       tzinfo (~> 1.1)
     addressable (2.5.2)
       public_suffix (>= 2.0.2, < 4.0)
+    ast (2.4.0)
     awesome_print (1.8.0)
     concurrent-ruby (1.0.5)
     diff-lcs (1.3)
-    et-orbi (1.1.0)
+    et-orbi (1.1.4)
       tzinfo
-    factory_bot (4.8.2)
+    factory_bot (4.10.0)
       activesupport (>= 3.0.0)
+    fugit (1.1.4)
+      et-orbi (~> 1.1, >= 1.1.3)
+      raabro (~> 1.1)
     i18n (1.0.1)
       concurrent-ruby (~> 1.0)
+    jaro_winkler (1.5.1)
     json-schema (2.8.0)
       addressable (>= 2.4)
     minitest (5.11.3)
+    parallel (1.12.1)
+    parser (2.5.1.2)
+      ast (~> 2.4.0)
+    powerpack (0.1.2)
     public_suffix (3.0.2)
+    raabro (1.1.6)
+    rainbow (3.0.0)
     rake (12.3.1)
     rspec (3.7.0)
       rspec-core (~> 3.7.0)
@@ -35,12 +46,22 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.7.0)
     rspec-support (3.7.1)
-    rufus-scheduler (3.4.2)
-      et-orbi (~> 1.0)
+    rubocop (0.58.2)
+      jaro_winkler (~> 1.5.1)
+      parallel (~> 1.10)
+      parser (>= 2.5, != 2.5.1.1)
+      powerpack (~> 0.1)
+      rainbow (>= 2.2.2, < 4.0)
+      ruby-progressbar (~> 1.7)
+      unicode-display_width (~> 1.0, >= 1.0.1)
+    ruby-progressbar (1.9.0)
+    rufus-scheduler (3.5.1)
+      fugit (~> 1.1, >= 1.1.4)
     thread_safe (0.3.6)
     tzinfo (1.2.5)
       thread_safe (~> 0.1)
-    yard (0.9.12)
+    unicode-display_width (1.4.0)
+    yard (0.9.15)
 
 PLATFORMS
   ruby
@@ -52,6 +73,7 @@ DEPENDENCIES
   json-schema
   rake
   rspec
+  rubocop
   rufus-scheduler
   yard
 

@@ -681,7 +681,8 @@ RSpec.describe MFCCase do
         subject { sched.jobs.first }
 
         it 'should run every day' do
-          expect(subject.frequency).to be == 86_400
+          expect(subject.brute_frequency.delta_min).to be == 86_400
+          expect(subject.brute_frequency.delta_max).to be == 86_400
         end
 
         it 'should start tomorrow' do

@@ -12,4 +12,5 @@ group :development, :test do
   gem 'awesome_print'
   gem 'factory_bot'
   gem 'rspec'
+  gem 'rubocop'
 end
