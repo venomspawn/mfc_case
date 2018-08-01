@@ -140,6 +140,7 @@ RSpec.describe MFCCase do
         pending_register_institution_office_settlement
         pending_register_institution_office_street
         pending_register_number
+        pending_register_operator_id
         pending_register_operator_middle_name
         pending_register_operator_name
         pending_register_operator_position
@@ -187,6 +188,7 @@ RSpec.describe MFCCase do
         pending_rejecting_register_institution_office_settlement
         pending_rejecting_register_institution_office_street
         pending_rejecting_register_number
+        pending_rejecting_register_operator_id
         pending_rejecting_register_operator_middle_name
         pending_rejecting_register_operator_name
         pending_rejecting_register_operator_position
@@ -228,6 +230,7 @@ RSpec.describe MFCCase do
         pending_register_institution_office_settlement
         pending_register_institution_office_street
         pending_register_number
+        pending_register_operator_id
         pending_register_operator_middle_name
         pending_register_operator_name
         pending_register_operator_position
@@ -278,6 +281,7 @@ RSpec.describe MFCCase do
         pending_rejecting_register_institution_office_settlement
         pending_rejecting_register_institution_office_street
         pending_rejecting_register_number
+        pending_rejecting_register_operator_id
         pending_rejecting_register_operator_middle_name
         pending_rejecting_register_operator_name
         pending_rejecting_register_operator_position
@@ -332,6 +336,7 @@ RSpec.describe MFCCase do
         issuance_office_mfc_room
         issuance_office_mfc_settlement
         issuance_office_mfc_street
+        issuance_operator_id
         issuance_operator_middle_name
         issuance_operator_name
         issuance_operator_position
@@ -377,6 +382,7 @@ RSpec.describe MFCCase do
         closed_office_mfc_room
         closed_office_mfc_settlement
         closed_office_mfc_street
+        closed_operator_id
         closed_operator_middle_name
         closed_operator_name
         closed_operator_position
@@ -515,6 +521,7 @@ RSpec.describe MFCCase do
         closed_office_mfc_room
         closed_office_mfc_settlement
         closed_office_mfc_street
+        closed_operator_id
         closed_operator_middle_name
         closed_operator_name
         closed_operator_position
@@ -570,6 +577,7 @@ RSpec.describe MFCCase do
         processing_office_mfc_room
         processing_office_mfc_settlement
         processing_office_mfc_street
+        processing_operator_id
         processing_operator_middle_name
         processing_operator_name
         processing_operator_position
