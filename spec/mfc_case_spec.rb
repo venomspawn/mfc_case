@@ -558,20 +558,18 @@ RSpec.describe MFCCase do
       end
 
       attributes = %i[
-        processing_institution_name
-        processing_institution_office_building
-        processing_institution_office_city
-        processing_institution_office_country_code
-        processing_institution_office_country_name
-        processing_institution_office_district
-        processing_institution_office_house
-        processing_institution_office_index
-        processing_institution_office_region_code
-        processing_institution_office_region_name
-        processing_institution_office_room
-        processing_institution_office_settlement
-        processing_institution_office_street
-        processing_number
+        processing_office_mfc_building
+        processing_office_mfc_city
+        processing_office_mfc_country_code
+        processing_office_mfc_country_name
+        processing_office_mfc_district
+        processing_office_mfc_house
+        processing_office_mfc_index
+        processing_office_mfc_region_code
+        processing_office_mfc_region_name
+        processing_office_mfc_room
+        processing_office_mfc_settlement
+        processing_office_mfc_street
         processing_operator_middle_name
         processing_operator_name
         processing_operator_position
