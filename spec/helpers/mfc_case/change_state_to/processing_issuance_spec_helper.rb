@@ -16,7 +16,8 @@ module MFCCase
       # @return [CaseCore::Models::Case]
       #   созданная запись заявки
       def create_case(state)
-        super(state, {})
+        attrs = { planned_issuance_finish_date: Time.now.strftime('%d.%m.%Y') }
+        super(state, attrs)
       end
     end
   end

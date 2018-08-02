@@ -21,8 +21,9 @@ module MFCCase
       #   созданная запись заявки
       def create_case(state, issue_method, rejecting_date)
         attributes = {
-          issue_method:   issue_method,
-          rejecting_date: rejecting_date
+          issue_method:           issue_method,
+          rejecting_date:         rejecting_date,
+          planned_receiving_date: Time.now.strftime('%d.%m.%Y')
         }
         super(state, attributes)
       end
