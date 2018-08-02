@@ -103,7 +103,7 @@ module MFCCase
          set: {
            case_status: CASE_STATUS[:processing],
            processing_sending_date: :now,
-           planned_finish_data: :planned_receiving_date,
+           planned_finish_date: :planned_receiving_date,
            **from_params_with_the_same_names(
              :processing_office_mfc_building,
              :processing_office_mfc_city,
