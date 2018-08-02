@@ -125,6 +125,12 @@ RSpec.describe MFCCase do
           .of(Time.now)
       end
 
+      it 'should set `planned_finish_date` to `planned_sending_date`' do
+        subject
+        expect(case_attributes(c4s3)[:planned_finish_date])
+          .to be == case_attributes(c4s3)[:planned_sending_date]
+      end
+
       attributes = %i[
         pending_register_institution_name
         pending_register_institution_office_building
@@ -173,6 +179,12 @@ RSpec.describe MFCCase do
           .of(Time.now)
       end
 
+      it 'should set `planned_finish_date` properly' do
+        subject
+        expect(case_attributes(c4s3)[:planned_finish_date])
+          .to be == case_attributes(c4s3)[:planned_rejecting_finish_date]
+      end
+
       attributes = %i[
         pending_rejecting_register_institution_name
         pending_rejecting_register_institution_office_building
@@ -213,6 +225,12 @@ RSpec.describe MFCCase do
         expect { subject }
           .to change { case_status(c4s3) }
           .to(described_class::ChangeStateTo::CASE_STATUS[:packaging])
+      end
+
+      it 'should set `planned_finish_date` to `planned_sending_date`' do
+        subject
+        expect(case_attributes(c4s3)[:planned_finish_date])
+          .to be == case_attributes(c4s3)[:planned_sending_date]
       end
 
       attributes = %i[
@@ -264,6 +282,12 @@ RSpec.describe MFCCase do
         expect { subject }
           .to change { case_status(c4s3) }
           .to(described_class::ChangeStateTo::CASE_STATUS[:rejecting])
+      end
+
+      it 'should set `planned_finish_date` properly' do
+        subject
+        expect(case_attributes(c4s3)[:planned_finish_date])
+          .to be == case_attributes(c4s3)[:planned_rejecting_finish_date]
       end
 
       attributes = %i[
@@ -323,6 +347,12 @@ RSpec.describe MFCCase do
           .of(Time.now)
       end
 
+      it 'should set `planned_finish_date` properly' do
+        subject
+        expect(case_attributes(c4s3)[:planned_finish_date])
+          .to be == case_attributes(c4s3)[:planned_issuance_finish_date]
+      end
+
       attributes = %i[
         issuance_office_mfc_building
         issuance_office_mfc_city
@@ -367,6 +397,11 @@ RSpec.describe MFCCase do
       it 'should set `closed_date` attribute value to now time' do
         subject
         expect(case_closed_date(c4s3)).to be_within(1).of(Time.now)
+      end
+
+      it 'should set `planned_finish_date` to `nil`' do
+        subject
+        expect(case_attributes(c4s3)[:planned_finish_date]).to be_nil
       end
 
       attributes = %i[
@@ -448,6 +483,12 @@ RSpec.describe MFCCase do
         expect(case_rejecting_date(c4s3)).to be_within(1).of(Time.now)
       end
 
+      it 'should set `planned_finish_date` properly' do
+        subject
+        expect(case_attributes(c4s3)[:planned_finish_date])
+          .to be == case_attributes(c4s3)[:planned_rejecting_finish_date]
+      end
+
       context 'when `planned_rejecting_date` attribute is absent' do
         let(:c4s3) { create(:case, type: 'mfc_case') }
         let!(:attrs) { create(:case_attributes, **args) }
@@ -508,6 +549,11 @@ RSpec.describe MFCCase do
         expect(case_closed_date(c4s3)).to be_within(1).of(Time.now)
       end
 
+      it 'should set `planned_finish_date` to `nil`' do
+        subject
+        expect(case_attributes(c4s3)[:planned_finish_date]).to be_nil
+      end
+
       attributes = %i[
         closed_office_mfc_building
         closed_office_mfc_city
@@ -564,6 +610,12 @@ RSpec.describe MFCCase do
         expect(case_processing_sending_date(c4s3)).to be_within(1).of(Time.now)
       end
 
+      it 'should set `planned_finish_date` to `planned_receiving_date`' do
+        subject
+        expect(case_attributes(c4s3)[:planned_finish_date])
+          .to be == case_attributes(c4s3)[:planned_receiving_date]
+      end
+
       attributes = %i[
         processing_office_mfc_building
         processing_office_mfc_city
@@ -609,6 +661,10 @@ RSpec.describe MFCCase do
     subject { described_class.on_case_creation(c4s3) }
 
     let(:c4s3) { create(:case, type: 'mfc_case') }
+    let!(:planned_sending_date) { create(:case_attribute, *planned_traits) }
+    let(:planned_traits) { [case_id: c4s3.id, name: name, value: value] }
+    let(:name) { 'planned_sending_date' }
+    let(:value) { Time.now.strftime('%d.%m.%Y') }
 
     it 'should set case state to `packaging`' do
       expect { subject }.to change { case_state(c4s3) }.to('packaging')
@@ -624,8 +680,15 @@ RSpec.describe MFCCase do
         .to(described_class::ChangeStateTo::CASE_STATUS[:packaging])
     end
 
+    it 'should set `planned_finish_date` to `planned_sending_date`' do
+      subject
+      expect(case_attributes(c4s3)[:planned_finish_date])
+        .to be == case_attributes(c4s3)[:planned_sending_date]
+    end
+
     context 'when `case` argument is not of `CaseCore::Models::Case` type' do
       let(:c4s3) { 'not of `CaseCore::Models::Case` type' }
+      let(:planned_traits) { [] }
 
       it 'should raise ArgumentError' do
         expect { subject }.to raise_error(ArgumentError)

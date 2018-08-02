@@ -26,6 +26,7 @@ module MFCCase
         pending_rejecting_register_institution_office_settlement
         pending_rejecting_register_institution_office_street
         pending_rejecting_register_number
+        pending_rejecting_register_operator_id
         pending_rejecting_register_operator_middle_name
         pending_rejecting_register_operator_name
         pending_rejecting_register_operator_position
@@ -44,6 +45,8 @@ module MFCCase
         attributes = ATTRIBUTE_NAMES.each_with_object({}) do |name, memo|
           memo[name] = FactoryBot.create(:string)
         end
+        attributes[:planned_rejecting_finish_date] =
+          Time.now.strftime('%d.%m.%Y')
         super(state, rejecting_date: rejecting_date, **attributes)
       end
     end
