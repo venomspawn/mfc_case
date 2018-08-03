@@ -292,13 +292,19 @@ module MFCCase
     # Модуль методов, подключаемых к объекту, в контексте которого происходят
     # проверки атрибутов при переходе по дуге графа переходов состояния заявки
     module CheckContextMethods
+      # Значение атрибута `issue_method`, означающее, что результат оказания
+      # услуги выдаётся в ведомстве
+      ISSUE_METHOD_INSTITUTION = 'institution'
+
       # Возвращает, предполагается ли выдача результатов оказания услуги
       # непосредственно в ведомстве
       # @return [Boolean]
       #   предполагается ли выдача результатов оказания услуги непосредственно
       #   в ведомстве
+      # @return [NilClass]
+      #   если значение атрибута `issue_method` равно `nil`
       def issuance_in_institution?
-        issue_method == 'institution'
+        ISSUE_METHOD_INSTITUTION.casecmp?(issue_method)
       end
 
       # Возвращает, присутствует ли атрибут `rejecting_date` с непустым
