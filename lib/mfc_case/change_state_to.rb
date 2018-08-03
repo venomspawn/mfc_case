@@ -301,10 +301,9 @@ module MFCCase
       # @return [Boolean]
       #   предполагается ли выдача результатов оказания услуги непосредственно
       #   в ведомстве
-      # @return [NilClass]
-      #   если значение атрибута `issue_method` равно `nil`
       def issuance_in_institution?
-        ISSUE_METHOD_INSTITUTION.casecmp?(issue_method)
+        return false if issue_method.nil?
+        issue_method.casecmp?(ISSUE_METHOD_INSTITUTION)
       end
 
       # Возвращает, присутствует ли атрибут `rejecting_date` с непустым
